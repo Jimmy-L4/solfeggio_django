@@ -29,5 +29,5 @@ class ClassSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Teacher
+        model = Course
         fields = '__all__'

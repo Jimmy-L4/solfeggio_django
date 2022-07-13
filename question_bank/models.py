@@ -10,11 +10,13 @@ class ChoiceQuestion(models.Model):
     difficulty = models.CharField(max_length=5)
     extra_info = models.TextField(null=True)
     L_ques_txt = models.TextField()
+    L_ques_score = models.IntegerField(default=0)
     ques_txt = models.TextField()
     ques_audio_path = models.TextField()
     ques_xml_path = models.TextField(null=True)
     ques_pic_path = models.TextField(null=True)
     choice_rank = models.CharField(max_length=5)
+    lesson_No = models.CharField(max_length=5, null=True)
     score = models.IntegerField()
     a_pic_path = models.TextField()
     a_xml_path = models.TextField()
@@ -33,3 +35,26 @@ class ChoiceQuestion(models.Model):
     d_audio_path = models.TextField()
     d_txt = models.TextField(null=True)
     ques_audio_size = models.FloatField()
+
+
+# 视唱题题库
+class SightsingingQuestion(models.Model):
+    part_id = models.CharField(max_length=50)
+    part_name = models.CharField(max_length=20)
+    part_rank = models.CharField(max_length=5)
+    lesson_No = models.CharField(max_length=5)
+    audio_path = models.TextField()
+    pic_path = models.TextField()
+    xml_path = models.TextField()
+    audio_size = models.FloatField()
+
+
+# 音频库
+class AudioDetail(models.Model):
+    part_id = models.CharField(max_length=50)
+    audio_name = models.TextField(null=True)
+    audio_player = models.TextField()
+    audio_instrument = models.TextField()
+    audio_nation = models.TextField(null=True)
+    audio_skill = models.TextField(null=True)
+    audio_size = models.FloatField()

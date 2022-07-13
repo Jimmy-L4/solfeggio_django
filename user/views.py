@@ -47,6 +47,7 @@ class UserInfo(APIView):
             data = serializer.data
             data['className'] = classSerializer.data['name']
             data['curriculumName'] = courseSerializer.data['name']
+            data['course'] = courseSerializer.data
             # 目前版本的权限并未进行设置
             data['roleId'] = 'student'
             data['role'] = {'id': 'student', 'name': '学生', 'describe': '拥有所有权限', 'status': 1, 'creatorId': 'system',
@@ -64,6 +65,7 @@ class UserInfo(APIView):
                             ],
                             }
             data['avatar'] = '/api' + data['avatar']
+            data['lesson_No'] = '3'
             response = {'result': data}
 
         # 返回 Json 数据
@@ -243,7 +245,7 @@ class UserNav(APIView):
                         'icon': 'book',
                         'show': False,
                     },
-                    'redirect': '/answer/choice-layout',
+                    'redirect': '/study/sightsing-list',
                     'component': 'RouteView',
                 },
                 {

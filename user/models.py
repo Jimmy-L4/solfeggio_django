@@ -29,7 +29,7 @@ class Course(models.Model):
     # 教师
     teacher = models.ForeignKey(Teacher, null=True, on_delete=models.SET(0), related_name='course_teacher')
     # 课程等级
-    rank = models.CharField(max_length=10)
+    grade = models.CharField(max_length=10)
     # 课程时间
     time = models.CharField(max_length=50)
     # 课程地点
@@ -55,6 +55,8 @@ class Student(models.Model):
     created = models.DateTimeField(default=timezone.now)
     # 头像
     avatar = models.ImageField(upload_to='avatar/%Y%m%d')
+    # 是否开启节拍器自动播放
+    metronome = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
