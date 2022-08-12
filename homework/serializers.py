@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from homework.models import SightsingingRecord, ChoiceRecord, DictationRecord, Audio, Json, Png
+from homework.models import SightsingingRecord, ChoiceRecord, DictationRecord, QuesGroupRecord, Audio, Json, Png
 
 
 class SightsingingSerializer(serializers.ModelSerializer):
@@ -17,6 +17,12 @@ class ChoiceSerializer(serializers.ModelSerializer):
 class DictationSerializer(serializers.ModelSerializer):
     class Meta:
         model = DictationRecord
+        fields = '__all__'
+
+
+class QuesGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuesGroupRecord
         fields = '__all__'
 
 

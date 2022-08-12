@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -25,10 +27,12 @@ class UserInfo(APIView):
     def get(self, request):
         try:
             user = request.user
+            if user.username == '':
+                raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            raise Http404
+            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
 
         # 查看用户身份
         # 教师
@@ -45,6 +49,7 @@ class UserInfo(APIView):
             classSerializer = ClassSerializer(className)
             courseSerializer = CourseSerializer(courseName)
             data = serializer.data
+            data['is_superuser'] = userSerializer.data['is_superuser']
             data['className'] = classSerializer.data['name']
             data['curriculumName'] = courseSerializer.data['name']
             data['course'] = courseSerializer.data
@@ -65,7 +70,8 @@ class UserInfo(APIView):
                             ],
                             }
             data['avatar'] = '/api' + data['avatar']
-            data['lesson_No'] = '3'
+            data['lesson_No'] = '2'
+            data['lesson_deadline'] = datetime(year=2022, month=7, day=14, hour=21, minute=00)
             response = {'result': data}
 
         # 返回 Json 数据
@@ -78,10 +84,12 @@ class UserNav(APIView):
     def get(self, request):
         try:
             user = request.user
+            if user.username == '':
+                raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            raise Http404
+            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
 
         # 查看用户身份
         # 教师
@@ -241,7 +249,7 @@ class UserNav(APIView):
                     'parentId': 0,
                     'id': 700,
                     'meta': {
-                        'title': '答题空间',
+                        'title': '学习空间',
                         'icon': 'book',
                         'show': False,
                     },

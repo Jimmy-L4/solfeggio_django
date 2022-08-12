@@ -24,17 +24,16 @@ class NoticeList(APIView):
             raise Http404
 
     def get(self, request):
-        print(request.GET.get('display'))
         if request.GET.get('display') == 'true':
             notice = Notice.objects.filter(type=1)
         else:
-            notice = Notice.objects.all()
+            notice = Notice.objects.filter(type__gte=0)
 
         serializer = NoticeListSerializer(notice, many=True)
         data = []
         for notice in serializer.data:
             param = {'id': notice['id'],
-                     'user': {'nickname': notice['nickname'], 'avatar': '/api' + notice['avatar']},
+                     'user': {'nickname': notice['nickname'], 'avatar': notice['avatar']},
                      'project': {'title': notice['title'], 'content': notice['content'], 'class': notice['classes'],
                                  'type': notice['type']},
                      'startAt': notice['created']}
@@ -42,8 +41,9 @@ class NoticeList(APIView):
         # 返回 Json 数据
         return Response(data)
 
-    def put(self, request, pk):
-        notice = self.get_object(pk)
+    def put(self, request):
+        id = request.data.get('id')
+        notice = self.get_object(id)
         serializer = NoticeListSerializer(notice, data=request.data)
         # 验证提交的数据是否合法
         # 不合法则返回400
@@ -54,8 +54,26 @@ class NoticeList(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
-        notice = self.get_object(pk)
-        notice.delete()
-        # 删除成功后返回204
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def post(self, request):
+        serializer = NoticeListSerializer(data=request.data)
+        # 验证提交的数据是否合法
+        # 不合法则返回400
+        if serializer.is_valid():
+            # 序列化器将持有的数据反序列化后，
+            # 保存到数据库中
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        id = request.data.get('id')
+        notice = self.get_object(id)
+        serializer = NoticeListSerializer(notice, data=request.data)
+        # 验证提交的数据是否合法
+        # 不合法则返回400
+        if serializer.is_valid():
+            # 序列化器将持有的数据反序列化后，
+            # 保存到数据库中
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -9,9 +9,9 @@ class SightsingingRecord(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='sightsinging_user')
     part_id = models.CharField(max_length=50)
     record_time = models.DateTimeField(default=timezone.now)
-    audio = models.FileField()
-    vice_audio = models.FileField(null=True)
-    merge_audio = models.FileField(null=True)
+    audio = models.TextField()
+    vice_audio = models.TextField(null=True)
+    merge_audio = models.TextField(null=True)
     computer_score = models.IntegerField(null=True)
     teacher_score = models.IntegerField(null=True)
     fluency = models.IntegerField(null=True)
@@ -26,11 +26,11 @@ class SightsingingRecord(models.Model):
 
 # 选择题作业
 class ChoiceRecord(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='choice_user')
+    user = models.ForeignKey(User, on_delete=models.SET(0), related_name='choice_user')
     part_id = models.CharField(max_length=50)
     record_time = models.DateTimeField(default=timezone.now)
     response = models.CharField(max_length=5)
-    score = models.IntegerField(null=True)
+    score = models.IntegerField()
 
     def __str__(self):
         return self.part_id
@@ -44,9 +44,22 @@ class DictationRecord(models.Model):
     png_field = models.FileField(null=True)
     computer_score = models.IntegerField(null=True)
     teacher_score = models.IntegerField(null=True)
+    record_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.part_id
+
+
+# 题组列表
+class QuesGroupRecord(models.Model):
+    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='Ques_user')
+    group_part_id = models.CharField(max_length=50)
+    group_title = models.TextField()
+    lesson_No = models.CharField(max_length=5)
+    state = models.IntegerField()
+    computer_score = models.IntegerField(null=True)
+    teacher_score = models.IntegerField(null=True)
+    record_time = models.DateTimeField(default=timezone.now)
 
 
 class Audio(models.Model):

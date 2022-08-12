@@ -17,7 +17,7 @@ class Notice(models.Model):
     # 作者昵称、头像
     nickname = models.CharField(max_length=100, null=True)
 
-    avatar = models.ImageField(upload_to='avatar/%Y%m%d', null=True)
+    avatar = models.TextField(null=True)
     # 作者
     author = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='notices')
     # 创建时间

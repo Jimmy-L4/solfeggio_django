@@ -11,6 +11,7 @@ class ChoiceQuestion(models.Model):
     extra_info = models.TextField(null=True)
     L_ques_txt = models.TextField()
     L_ques_score = models.IntegerField(default=0)
+    part_name = models.CharField(max_length=20)
     ques_txt = models.TextField()
     ques_audio_path = models.TextField()
     ques_xml_path = models.TextField(null=True)
