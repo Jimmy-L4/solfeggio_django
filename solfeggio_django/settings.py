@@ -23,10 +23,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '-rr=*8%^jrs1tj=9_phn&qqo&^len$6m$0)+^&l*%_5twhv8&q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+# 修改项。指定需要收集的静态文件的位置
+# 即前端打包文件所在位置
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "frontend/dist/"),
+]
+
+# 新增项。静态文件收集目录
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,7 +52,9 @@ INSTALLED_APPS = [
     # 作业
     'homework',
     # 题库
-    'question_bank'
+    'question_bank',
+    # 管理器
+    'manager'
 ]
 
 MIDDLEWARE = [
@@ -83,10 +93,18 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
         'NAME': 'solfeggio_django',  # 数据库名，先前创建的
         'USER': 'root',  # 用户名，可以自己创建用户
-        'PASSWORD': 'bupt2021',  # 密码
-        'HOST': '10.112.59.2',  # mysql服务所在的主机ip
+        'PASSWORD': 'Chuyanjihua_201821',  # 密码
+        'HOST': '62.234.135.208',  # mysql服务所在的主机ip
         'PORT': '3306',  # mysql服务端口
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
+    #     'NAME': 'solfeggio_django',  # 数据库名，先前创建的
+    #     'USER': 'root',  # 用户名，可以自己创建用户
+    #     'PASSWORD': 'bupt2021',  # 密码
+    #     'HOST': '10.112.59.2',  # mysql服务所在的主机ip
+    #     'PORT': '3306',  # mysql服务端口
+    # }
 }
 
 # Password validation
@@ -135,7 +153,6 @@ REST_FRAMEWORK = {
     )
 
 }
-
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),

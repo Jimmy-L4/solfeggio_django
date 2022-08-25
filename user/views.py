@@ -6,10 +6,29 @@ from rest_framework import status
 
 from django.http import Http404
 
+from manager.views import getDeadline, getValidLessons, getLesson_No
+
 from user.models import Student, Teacher, Class, Course
 from django.contrib.auth.models import User
 from user.serializers import StudentSerializer, TeacherSerializer, CourseSerializer, ClassSerializer, UserSerializer
 from user.permissions import IsAdminUserOrReadOnly
+
+
+# 获取学生课程信息
+def getCourseInfo(student_id):
+    userInfo = Student.objects.get(id=student_id)
+    serializer = StudentSerializer(userInfo)
+    # 课程默认每个学生一学期只能修一门课
+    courseName = Course.objects.get(id=serializer.data['course'][0])
+    courseSerializer = CourseSerializer(courseName)
+    return courseSerializer.data
+
+
+# 获取学生信息
+def getStudentInfo(user_id):
+    userInfo = Student.objects.get(user=user_id)
+    serializer = StudentSerializer(userInfo)
+    return serializer.data
 
 
 class UserList(APIView):
@@ -22,7 +41,6 @@ class UserList(APIView):
 
 
 class UserInfo(APIView):
-    permission_classes = [IsAdminUserOrReadOnly]
 
     def get(self, request):
         try:
@@ -69,11 +87,58 @@ class UserInfo(APIView):
                                 },
                             ],
                             }
-            data['avatar'] = '/api' + data['avatar']
-            data['lesson_No'] = '2'
-            data['lesson_deadline'] = datetime(year=2022, month=7, day=14, hour=21, minute=00)
+            data['avatar'] = data['avatar']
+            data['lesson_No'] = str(getLesson_No())
+            data['lesson_deadline'] = getDeadline()
+            data['vailLessons'] = getValidLessons(serializer.data['id'])
             response = {'result': data}
 
+        # 返回 Json 数据
+        return Response(response)
+
+    def put(self, request):
+        try:
+            user = request.user
+            if user.username == '':
+                raise Exception("用户必须登录")
+            userSerializer = UserSerializer(user)
+        except:
+            # 未登录
+            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+        userInfo = Student.objects.get(user=userSerializer.data['id'])
+        serializer = StudentSerializer(userInfo)
+        info = serializer.data
+        info.update(request.data)
+        verify_data = StudentSerializer(instance=userInfo, data=info)
+        # 验证提交的数据是否合法
+        # 不合法则返回400
+
+        if verify_data.is_valid():
+            # 序列化器将持有的数据反序列化后，
+            # 保存到数据库中
+            verify_data.save()
+            return Response(verify_data.data)
+        print(verify_data.errors)
+        return Response(verify_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StudentInfo(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            if user.username == '':
+                raise Exception("用户必须登录")
+            userSerializer = UserSerializer(user)
+        except:
+            # 未登录
+            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+        print(request.query_params)
+        studentId = request.query_params['studentId']
+        userInfo = Student.objects.filter(id=studentId).first()
+        if userInfo is None:
+            return Response('未搜索到学生，请核对学号是否正确！', status=status.HTTP_400_BAD_REQUEST)
+        serializer = StudentSerializer(userInfo)
+        response = {'result': serializer.data}
         # 返回 Json 数据
         return Response(response)
 
@@ -93,6 +158,7 @@ class UserNav(APIView):
 
         # 查看用户身份
         # 教师
+        print(userSerializer.data)
         if userSerializer.data['groups'][0] == 1:
             userInfo = Teacher.objects.get(user=userSerializer.data['id'])
             serializer = TeacherSerializer(userInfo)
@@ -152,41 +218,31 @@ class UserNav(APIView):
                     },
                     'component': 'DictationList',
                 },
-                {
-                    'name': 'management',
-                    'parentId': 0,
-                    'id': 300,
-                    'meta': {
-                        'icon': 'team',
-                        'title': '学生管理',
-                        'show': True,
-                    },
-                    'component': 'StudentList',
-                },
+                # {
+                #     'name': 'management',
+                #     'parentId': 0,
+                #     'id': 300,
+                #     'meta': {
+                #         'icon': 'team',
+                #         'title': '学生管理',
+                #         'show': True,
+                #     },
+                #     'component': 'StudentList',
+                # },
+                #
+                # {
+                #     'name': 'workbench',
+                #     'parentId': 0,
+                #     'id': 400,
+                #     'meta': {
+                #         'icon': 'form',
+                #         'title': '作业空间',
+                #         'show': True,
+                #     },
+                #     'component': 'Workbench',
+                # },
+                #
 
-                {
-                    'name': 'workbench',
-                    'parentId': 0,
-                    'id': 400,
-                    'meta': {
-                        'icon': 'form',
-                        'title': '作业空间',
-                        'show': True,
-                    },
-                    'component': 'Workbench',
-                },
-
-                {
-                    'name': 'bulletinboard',
-                    'parentId': 0,
-                    'id': 500,
-                    'meta': {
-                        'icon': 'notification',
-                        'title': '通知管理',
-                        'show': True,
-                    },
-                    'component': 'BulletinBoard',
-                },
                 {
                     'name': 'account',
                     'parentId': 0,
@@ -209,6 +265,7 @@ class UserNav(APIView):
                     },
                     'component': 'AccountCenter',
                 },
+
                 {
                     'name': 'settings',
                     'parentId': 600,
@@ -297,9 +354,77 @@ class UserNav(APIView):
                     },
                     'component': 'Correcting',
                 },
+                {
+                    'name': 'Result',
+                    'parentId': 0,
+                    'id': 900,
+                    'meta': {
+                        'title': '作业详情',
+                        'icon': 'book',
+                        'show': False,
+                    },
+                    'redirect': '/account/center',
+                    'component': 'RouteView',
+                },
+                {
+                    'name': 'choice-result',
+                    'parentId': 900,
+                    'id': 901,
+                    'meta': {
+                        'title': '选择题结果',
+                        'show': False,
+                    },
+                    'component': 'ChoiceResult',
+                },
+                {
+                    'name': 'sightsing-result',
+                    'parentId': 900,
+                    'id': 902,
+                    'meta': {
+                        'title': '视唱结果',
+                        'show': False,
+                    },
+                    'component': 'SightsingResult',
+                },
+                {
+                    'name': 'dictation-result',
+                    'parentId': 900,
+                    'id': 903,
+                    'meta': {
+                        'title': '听写题结果',
+                        'show': False,
+                    },
+                    'component': 'DictationResult',
+                },
 
             ]
+            if userSerializer.data['is_superuser']:
+                nav.insert(5,
+                           {
+                               'name': 'bulletinboard',
+                               'parentId': 0,
+                               'id': 500,
+                               'meta': {
+                                   'icon': 'notification',
+                                   'title': '通知管理',
+                                   'show': True,
+                               },
+                               'component': 'BulletinBoard',
+                           }, )
             response = {'result': nav}
 
         # 返回 Json 数据
         return Response(response)
+
+
+class Logout(APIView):
+    def post(self, request):
+        try:
+            user = request.user
+            if user.username == '':
+                raise Exception("用户必须登录")
+            userSerializer = UserSerializer(user)
+        except:
+            # 未登录
+            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+        return Response('退出登录成功', status=status.HTTP_200_OK)

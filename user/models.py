@@ -54,7 +54,7 @@ class Student(models.Model):
     # 创建时间
     created = models.DateTimeField(default=timezone.now)
     # 头像
-    avatar = models.ImageField(upload_to='avatar/%Y%m%d')
+    avatar = models.TextField(null=True)
     # 是否开启节拍器自动播放
     metronome = models.BooleanField(default=False)
 

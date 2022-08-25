@@ -38,6 +38,28 @@ class ChoiceQuestion(models.Model):
     ques_audio_size = models.FloatField()
 
 
+# 听写题题库
+class DictationQuestion(models.Model):
+    part_id = models.CharField(max_length=50)
+    choice_ans = models.CharField(max_length=5)
+    extra_info = models.TextField(null=True)
+    L_ques_txt = models.TextField()
+    L_ques_score = models.IntegerField(default=0)
+    part_name = models.CharField(max_length=20)
+    ques_txt = models.TextField()
+    ques_audio_path = models.TextField()
+    ques_xml_path = models.TextField(null=True)
+    ques_pic_path = models.TextField(null=True)
+    choice_rank = models.CharField(max_length=5)
+    lesson_No = models.CharField(max_length=5, null=True)
+    score = models.IntegerField()
+    a_pic_path = models.TextField()
+    a_xml_path = models.TextField()
+    a_audio_path = models.TextField()
+    a_txt = models.TextField(null=True)
+    ques_audio_size = models.FloatField()
+
+
 # 视唱题题库
 class SightsingingQuestion(models.Model):
     part_id = models.CharField(max_length=50)

@@ -7,6 +7,7 @@ from django.utils import timezone
 # 视唱作业
 class SightsingingRecord(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='sightsinging_user')
+    coop_user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='sightsinging_coopUser')
     part_id = models.CharField(max_length=50)
     record_time = models.DateTimeField(default=timezone.now)
     audio = models.TextField()
@@ -40,8 +41,8 @@ class ChoiceRecord(models.Model):
 class DictationRecord(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='dictation_user')
     part_id = models.CharField(max_length=50)
-    json_field = models.FileField(null=True)
-    png_field = models.FileField(null=True)
+    json_field = models.TextField(null=True)
+    png_field = models.TextField(null=True)
     computer_score = models.IntegerField(null=True)
     teacher_score = models.IntegerField(null=True)
     record_time = models.DateTimeField(default=timezone.now)
@@ -53,6 +54,7 @@ class DictationRecord(models.Model):
 # 题组列表
 class QuesGroupRecord(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='Ques_user')
+    coop_user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='Ques_coopUser')
     group_part_id = models.CharField(max_length=50)
     group_title = models.TextField()
     lesson_No = models.CharField(max_length=5)
@@ -62,19 +64,30 @@ class QuesGroupRecord(models.Model):
     record_time = models.DateTimeField(default=timezone.now)
 
 
+def getFieldPath(instance, filename):
+    if filename[-3:] == 'wav':
+        return 'audio/%s/%s' % (instance.part_id, filename)
+    elif filename[-4:] == 'json':
+        return 'json/%s/%s' % (instance.part_id, filename)
+    elif filename[-3:] == 'png':
+        return 'png/%s/%s' % (instance.part_id, filename)
+    else:
+        return 'other/%s/%s' % (instance.part_id, filename)
+
+
 class Audio(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='audio_user')
-    content = models.FileField(upload_to='audio/%Y%m%d')
     part_id = models.CharField(max_length=50)
+    content = models.FileField(upload_to=getFieldPath)
 
 
 class Json(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='json_user')
-    content = models.FileField(upload_to='json/%Y%m%d')
     part_id = models.CharField(max_length=50)
+    content = models.FileField(upload_to=getFieldPath)
 
 
 class Png(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='png_user')
-    content = models.FileField(upload_to='png/%Y%m%d')
     part_id = models.CharField(max_length=50)
+    content = models.FileField(upload_to=getFieldPath)

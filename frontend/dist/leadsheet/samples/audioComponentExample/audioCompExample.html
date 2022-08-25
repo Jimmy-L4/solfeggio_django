@@ -1,0 +1,94 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Audio component</title>
+</head>
+<body>
+	<div id="main-container" class="container-fluid">
+		<div id="audioExample"></div>
+	</div>
+	
+	<div>
+		<a href="#" id="play">Play</a> |
+		<a href="#" id="pause">Pause</a> |
+		<a href="#" id="stop">Stop</a> |
+		<a href="#" id="loopOn">loop on (between 1s and 3s)</a> |
+		<a href="#" id="loopOff">loop off</a> |
+		<a href="#" id="loopOnWholeSong">loop on whole song</a> |
+		<a href="#" id="currentTime">console.log current Time</a> | &nbsp;&nbsp;&nbsp;
+		<a href="#" id="switchAudio">Switch audio</a> |	
+	</div>
+	<div>
+		<h2>AudioModule</h2>
+		<ol>
+			<li> Initialized with draw true
+				<ol>
+					<li><a href="#" id="loadSound">Load sound</a></li>
+					<li><a href="#" id="disable">Disable</a></li>
+					<li><a href="#" id="enable">Enable</a> </li>
+					<li>Disable Again</li>
+					<li><a href="#" id="loadAnotherSound">Load another sound</a> </li>
+				</ol>
+			</li>
+			<li>Initialized only with sound</li>
+			<li>Initialized with sound and wave drawing</li>
+		</ol>
+	</div>
+	<div>
+		<h2>AudioPlayer</h2>
+		<ol>
+			<li>Click on a random position (set cursor). Then play, should start from that position</li>
+			<li>Click pause and play. Should start from paused position.</li>
+			<li>Click on a random position (set cursor). Set play then stop. Click play, should start now from the begining</li>
+			<li>Selection: should start and enable loop</li>
+			<li>Click on wave while playing, should disable loop</li>
+		</ol>
+	</div><div>
+		<h2>AudioCursor</h2>
+		<ol>
+			<li>Draw cursor on load</li>
+			<li>Selection on audio should show purple</li>
+			<li>Single click should update cursor</li>
+			<li>Player should move cursor and also notes cursor</li>
+			<li>Note cursor follows audio cursor when playing (even in loops)</li>
+			<li>When clicking on note, audio cursor should start from there when playing</li>
+			<!-- <li><span style="color:#F00">TODO: when clicking, cursor notes is disabled</span></li> -->
+		</ol>
+	</div>
+	<div>
+		<h2>AudioDrawer</h2>
+		<ol>
+			<li>Draw (should shorten last bar and show well)</li>
+			<li>Resize (should be redrawn)</li>
+		</ol>
+	</div>
+	<div>
+		<h2>AudioController</h2>
+		<ol>
+			<li>Play twice: (second time should do nothing)</li>
+			<li>Pause twice: (second time should do nothing)</li>
+			<li>Play again: should resume</li>
+			<li>Stop, then play: should start from the begining</li>
+			<li>Play, pause then stop: should start from the begining</li>
+			<li>Play, pause then stop: should start from the begining</li>
+			<li>Let song finish and check it stopped correctly by pressing Play. Should start from the beginning</li>
+			<li>Loop: in all these action getCurrentTime() should work. Can be verified by the cursor.
+			<ul>
+				<li>Loop: click 'loop on' before play, should loop. </li>
+				<li>Click 'loop off' while playing. Should disable the loop.</li>
+				<li>Click 'loop on' while playing, should start loop.</li>
+				<li>Stop and click 'loop off' after playing, click 'play' to check if loop was disabled.</li>
+				<li>Click 'loop on whole song', check if works.</li>
+				<li>Enabling loop while playing (check getCurrentTime()) and disabling</li>
+				<ul>
+					<li>'Loop on' before current time arrives to loop start point. Then loop off</li>
+					<li>'Loop on' while current time is inside loop start and end points. Then loop off</li>
+					<li>'Loop on' while current time is after end loop point. Then loop off</li>
+				</ul>
+			</ul>
+			</li>
+		</ol>
+	</div>
+	<script data-main="audioComponentExample.js" src="../../external-libs/require.js"></script>
+</body>
+</html>

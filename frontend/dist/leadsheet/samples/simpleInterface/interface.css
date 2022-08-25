@@ -1,0 +1,662 @@
+
+body {
+  font-family: "lato";
+  color: #666;
+  /* background-image:url('img/handmadepaper.png'); */
+}
+
+
+/* Chord sequence view */
+.song_view-title {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+/* VIEW MAIN MENU */
+/* Main menu is set as absolute on affix-top also so the score container will not scroll down too when position will be fixed */
+#view_main_menu {
+  right: 0;
+  left: 0;
+  z-index: 100;
+  height: 133px;
+}
+
+#content>.affix {
+  z-index: 1000;
+  right: 0;
+  left: 0;
+  height: 128px;
+  top: 0 !important;
+  position: fixed !important;
+  -o-box-shadow: 0px 3px 5px #888;
+  -moz-box-shadow: 0px 3px 5px #888;
+  -webkit-box-shadow: 0px 3px 5px #888;
+  box-shadow: 0px 3px 5px #888;
+}
+
+#main_menu_first_level {
+  background-color: white;
+  text-align: center;
+  padding-top: 5px;
+}
+
+.first_level {
+  background-color: #ebebeb;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-border-radius: 10px 10px 0 0;
+  -webkit-border-radius: 10px 10px 0 0;
+  -o-border-radius: 10px 10px 0 0;
+  border-radius: 10px 10px 0 0;
+  display: inline-block;
+  width: 130px;
+  text-align: center;
+  margin: 0 0.3em;
+  cursor: pointer;
+  line-height: 2em;
+}
+
+.first_level:hover {
+  background-color: #ccc;
+}
+
+.main_menu_first_level_selected {
+  border-bottom: none !important;
+  background-color: #c1e0ea !important;
+}
+
+#main_menu_second_level {
+  background-color: #c1e0ea;
+}
+
+#main_menu_second_level>div {
+  height: 100px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.second_level>div>div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 100%;
+  vertical-align: top;
+  text-align: center;
+}
+
+.current_button {
+  cursor: pointer;
+  margin: 4px;
+  padding: 3px;
+  display: inline-block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.current_button:hover {
+  background: white;
+}
+
+/********* HARMONIZATION ***********/
+#harmonization_button_container {
+  line-height: 100px;
+  padding: 0px;
+  padding-left: 1em;
+}
+
+#harmonization_constraint_container {
+  padding: 20px 15px;
+}
+
+#harmonization_style_container {
+  padding: 2.5em 1em;
+}
+
+#harmonization_style_select {
+  margin: 0;
+  width: auto !important;
+}
+
+#harmonization_display_constraint_container {
+  position: absolute;
+}
+
+/********* CONSTRAINT ***********/
+#rightPanel {
+  width: 14em;
+  padding: 0 1em;
+  background-color: #c1e0ea;
+  border: thin solid #ccc;
+  min-height: 12em;
+  max-height: 22em;
+  overflow-y: auto;
+  top: 220px;
+  right: 0;
+  position: absolute;
+  display: none;
+  z-index: 12;
+  margin-right: 0.5em;
+}
+
+.current_history {
+  background-color: #eec;
+}
+
+.history_ul {
+  margin: 0;
+}
+
+.history_ul li {
+  cursor: pointer;
+}
+
+.history_ul li:hover {
+  background-color: #ddd;
+}
+
+#constraint_compute_button_container {
+  line-height: 100px;
+  padding: 0 0 0 1em;
+}
+
+#constraint_compute_button input {
+  height: 2em;
+}
+
+#constraint_input_container {
+  vertical-align: top;
+  display: inline-block;
+}
+
+#constraint_songsets_container,
+#constraint_composer_container,
+#constraint_timeSignature_container,
+#constraint_source_container {
+  padding: 2.5em 1em;
+}
+
+/*#constraint_source{
+	width: 200px;
+}*/
+#constraint_select_songsets,
+#constraint_select_composer,
+#constraint_select_source,
+#constraint_select_timeSignature {
+  margin: 0;
+  padding-bottom: 0.5em;
+  width: auto !important;
+}
+
+/********* PLAYER ***********/
+#playerview {
+  background-color: white;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 100;
+}
+
+#switch_player {
+  border-right: thin solid #000000;
+  height: 100%;
+  line-height: 66px;
+  margin: 0;
+  padding: 0 1em;
+  vertical-align: top;
+}
+
+#player_buttons_container {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  /*	border-right: 1px solid black;*/
+  height: 100%;
+  /*	padding: 20px 15px;*/
+}
+
+#type_button_container,
+#stop_button_container,
+#play_button_container,
+#tempo_container,
+#metronome_container,
+#volume_container,
+#volume_slider_container,
+#pause_button_container,
+#loop_button_container {
+  display: inline-block;
+  text-align: center;
+}
+
+#volume_slider_container {
+  z-index: 1;
+  position: relative;
+  cursor: pointer;
+}
+
+#volume_controller {
+  vertical-align: bottom !important;
+}
+
+#volume_controller_barre {
+  position: absolute;
+  z-index: 2;
+  right: 2px;
+  top: 20px;
+}
+
+#play_button_container {
+  color: gray;
+}
+
+.player_button {
+  cursor: pointer;
+  margin: 4px;
+  padding: 3px;
+  min-width: 50px;
+}
+
+.player_button:hover {
+  background: white;
+}
+
+#all-metronome .metronome_on {
+  display: none;
+}
+
+#loop_button .loop_on {
+  display: none;
+}
+
+#all-sound .sound_off,
+#all-sound .sound_1,
+#all-sound .sound_2 {
+  display: none;
+}
+
+#pause_button_container {
+  display: none;
+}
+
+#tempo_container input {
+  width: 41px;
+  margin: 0px;
+}
+
+#player_instrument_container {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  /*	vertical-align:top;*/
+  height: 100%;
+  margin-left: 10px;
+}
+
+/*#player_instrument_container .current_button{
+	vertical-align: top;
+}*/
+#player_chords {
+  display: inline-block;
+}
+
+#player_melody {
+  display: inline-block;
+}
+
+#pick_style_container {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#pick_style_container a {
+  color: black;
+  text-decoration: none;
+}
+
+#export_container {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#chords_title_container,
+#melody_title_container {
+  line-height: 50px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#chords_instrument_container,
+#chords_style_container,
+#melody_instrument_container,
+#melody_style_container {
+  display: inline-block;
+  text-align: center;
+}
+
+#player_instrument_container select {
+  height: 29px;
+  width: 175px;
+  margin: 3px 0 0;
+}
+
+.progress_bar_player {
+  margin-bottom: 0 !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
+  height: 15px !important;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.progress_bar_player span {
+  line-height: 16px;
+  vertical-align: top;
+}
+
+@media screen and (max-width: 860px) {
+  #playerview img {
+    width: 20px;
+  }
+
+  .player_button {
+    min-width: 20px;
+  }
+}
+
+/********* Note edition ***********/
+
+#edit_notes_second_level>div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 1em;
+  margin-top: 1em;
+  border-right: 1px solid #bbb;
+}
+
+#edit_each_pitch_container,
+#edit_each_alteration_container,
+#edit_each_rhythm_container,
+#edit_each_note_container,
+#edit_each_symbol_container {
+  font-size: 1.8em;
+}
+
+#edit_notes_second_level .current_button {
+  min-width: 5px;
+  height: 30px;
+  text-align: center;
+}
+
+
+@media screen and (max-width: 960px) {
+  #edit_notes_second_level .current_button img {
+    max-width: 15px;
+  }
+
+  #edit_notes_second_level .current_button {
+    font-size: smaller;
+    margin: 4px 0;
+  }
+}
+
+/********* Chord edition ***********/
+#edit_chords_second_level>div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 1em;
+  margin-top: 1em;
+  border-right: 1px solid #bbb;
+}
+
+#edit_chords_second_level .current_button {
+  min-width: 20px;
+  height: 30px;
+  text-align: center;
+}
+
+#hide_chord {
+  display: none;
+}
+
+#beat_chord {
+  display: inline-block;
+}
+
+#select_beat_chord,
+#select_beat_chord_step {
+  margin: 0;
+  width: auto !important;
+}
+
+#move_each_chords_container {
+  /*comment margin*/
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+
+.acResults {
+  z-index: 100;
+}
+
+#chord_helper_container {
+  padding: 0 !important;
+  background: white;
+}
+
+#chord_helper_container_chordName {
+  float: left;
+  line-height: 100px;
+  text-align: center;
+  min-width: 3em;
+  font-size: 1.2em;
+}
+
+/******* Bar Edition ******/
+#edit_bars_second_level>div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 0.9em;
+  padding-right: 0.9em;
+  padding-top: 1em;
+  margin-top: 1em;
+  border-right: 1px solid #bbb;
+}
+
+#edit_bars_second_level select {
+  width: auto !important;
+  margin: 0;
+}
+
+#edit_bars_second_level input {
+  width: auto !important;
+}
+
+/********* EDITOR ***********/
+#editor_menu_second_level>div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 1em;
+  margin-top: 1em;
+  border-right: 1px solid #bbb;
+}
+
+.sound_export_options {
+  display: inline-block;
+}
+
+.sound_export_options label {
+  display: inline;
+}
+
+.sound_export_options input {
+  margin: 0;
+}
+
+
+/********* HARMONIC ANALYSIS ***********/
+
+#harmonic_analysis_second_level>div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 1em;
+  margin-top: 1em;
+}
+
+/*********  ***********/
+
+#canvas_container {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 11;
+  width: 90%;
+  /*text-align: center;*/
+}
+
+#canvas_container canvas {
+  margin-bottom: 100px;
+}
+
+.chordSpaceInput {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 0;
+}
+
+
+/********* Jquery Autocomplete **********/
+.autocomplete-suggestions {
+  border: 1px solid #999;
+  background: #FFF;
+  cursor: default;
+  overflow: auto;
+  -webkit-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+  -moz-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+  box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+}
+
+.autocomplete-suggestion {
+  padding: 5px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.autocomplete-no-suggestion {
+  padding: 2px 5px;
+}
+
+.autocomplete-selected {
+  background: #F0F0F0;
+}
+
+.autocomplete-suggestions strong {
+  font-weight: bold;
+  color: #029cca;
+}
+
+.autocomplete-group {
+  padding: 2px 5px;
+}
+
+.autocomplete-group strong {
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
+  display: block;
+  border-bottom: 1px solid #000;
+}
+
+.autocomplete input {
+  font-size: 28px;
+  padding: 10px;
+  border: 1px solid #CCC;
+  display: block;
+  margin: 20px 0;
+}
+
+
+.backgroundPopin {
+  background: black;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 9000;
+}
+
+.foregroundPopin {
+  padding: 1em;
+  z-index: 9001;
+  background: white;
+  position: absolute;
+  top: 10%;
+}
+
+.foregroundPopin .close {
+  float: right;
+}
+
+/* for the moment bubble css for audio comments are here*/
+.speech-bubble {
+  height: 120px;
+  background-color: #f8f8f8;
+  border: 1px solid #a8a8f8;
+  border-radius: 5px;
+  max-width: 400px;
+  text-align: center;
+  padding: 5px;
+  position: absolute;
+  z-index: 20010;
+}
+
+.speech-bubble .textComment {
+  overflow-y: auto;
+  padding: 10px 10px 0 10px;
+  height: 78%;
+}
+
+.speech-bubble .arrow {
+  border-style: solid;
+  position: absolute;
+
+}
+
+.bottom {
+  border-color: #c8c8f8 transparent transparent transparent;
+  border-width: 8px 8px 0px 8px;
+  bottom: -8px;
+}
