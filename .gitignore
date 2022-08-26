@@ -1,6 +1,6 @@
-media/audio/
-media/json/
-media/png/
+media/audio/*
+media/json/*
+media/png/*
 
 # IntelliJ project files
 .idea
