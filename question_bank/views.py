@@ -1,3 +1,5 @@
+import re
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, viewsets
@@ -13,6 +15,11 @@ from user.serializers import UserSerializer
 from user.views import getStudentInfo
 
 from homework.views import GetState, GetChoiceInfo, GetDictationInfo, GetSightsingingInfo
+
+
+# 根据范例音文件地址匹配节拍器速度
+def getBpm(path):
+    return int(re.split('_|.mp3', path)[-2])
 
 
 # 视唱题列表
@@ -90,14 +97,16 @@ class SightsingingDetail(APIView):
         data['quesType'] = sightsingingInfo['ques_type']
         # 双声部需添加合作者信息
         if data['part_id'][2] == '3':
+            StudentInfo = getStudentInfo(sightsingingInfo['user'])
             coopStudentInfo = getStudentInfo(sightsingingInfo['coop_user'])
             data['coop_user'] = coopStudentInfo['name']
+            data['user'] = StudentInfo['name']
 
         state = GetState(data['part_id'][:-2], userId, studentInfo['id'])
         data['state'] = state
         data['note'] = 4
         data['beat'] = 4
-        data['bpm'] = int(data['audio_path'][-6:-4])
+        data['bpm'] = getBpm(data['audio_path'])
 
         return Response({'result': data})
 
@@ -203,7 +212,7 @@ class ChoiceDetail(APIView):
 
             body['note'] = 4
             body['beat'] = 4
-            body['bpm'] = 70
+            body['bpm'] = getBpm(ques['a_audio_path'])
             data.append(body)
 
         # 返回 Json 数据
@@ -297,7 +306,7 @@ class DictationDetail(APIView):
                 body['score'] = 0
             body['note'] = 4
             body['beat'] = 4
-            body['bpm'] = 70
+            body['bpm'] = getBpm(ques['a_audio_path'])
             data.append(body)
 
         # 返回 Json 数据

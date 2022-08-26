@@ -3,3 +3,7 @@
 *.iml
 out
 gen
+
+/media/json/*
+/media/png/*
+/media/audio/*

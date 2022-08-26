@@ -16,7 +16,7 @@ def getLesson_No():
     Lesson_No = weeks // 2 + 1
     if Lesson_No >= 8:
         Lesson_No = 8
-    print(Lesson_No)
+    print('当前课次:', Lesson_No)
     return Lesson_No
 
 
@@ -25,7 +25,6 @@ def getDeadline():
     lessonDay = datetime.timedelta(days=(getLesson_No() - 1) * 14)
     # 当前课次的第一个周五中午12点截止
     deadline = openingTime + lessonDay + datetime.timedelta(days=5, hours=12)
-    print(deadline)
     return deadline
 
 
@@ -48,6 +47,6 @@ def getValidLessons(student_id):
         validList[lesson_No - 1] = 0
     else:
         validList[lesson_No - 1] = -1
-    print(validList)
+    print('validList:', validList)
 
     return validList

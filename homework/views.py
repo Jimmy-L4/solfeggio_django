@@ -86,13 +86,11 @@ class SightsingingList(APIView):
         # 双声部需要添加合作者信息
         if part_id[2] == '3':
             data['coop_user'] = request.data['coopStudentInfo']['user']
-        print(data)
         verify_data = SightsingingSerializer(data=data)
         if verify_data.is_valid():
             save = verify_data.save()
             recordId = SightsingingSerializer(instance=save).data['id']
         else:
-            print(verify_data.data)
             return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
         print("log:向SightsingingRecord中存储数据成功")
 
