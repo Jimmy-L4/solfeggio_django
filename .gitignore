@@ -1,4 +1,9 @@
 media/audio/
 media/json/
 media/png/
+
+# IntelliJ project files
 .idea
+*.iml
+out
+gen
