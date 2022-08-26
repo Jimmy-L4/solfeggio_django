@@ -8,6 +8,7 @@ from django.utils import timezone
 class SightsingingRecord(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='sightsinging_user')
     coop_user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='sightsinging_coopUser')
+    ques_type = models.IntegerField(null=True)
     part_id = models.CharField(max_length=50)
     record_time = models.DateTimeField(default=timezone.now)
     audio = models.TextField()
@@ -62,6 +63,7 @@ class QuesGroupRecord(models.Model):
     computer_score = models.IntegerField(null=True)
     teacher_score = models.IntegerField(null=True)
     record_time = models.DateTimeField(default=timezone.now)
+    record_id = models.BigIntegerField(null=True)
 
 
 def getFieldPath(instance, filename):

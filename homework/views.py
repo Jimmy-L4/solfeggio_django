@@ -18,9 +18,6 @@ from question_bank.serializers import DictationSerializer as DictationInfo
 from manager.views import getValidLessons
 
 
-
-
-
 # 获取题组状态
 def GetState(group_part_id, user_id, student_id):
     state = getValidLessons(student_id)[int(group_part_id[18]) - 1]
@@ -53,10 +50,9 @@ def GetDictationInfo(part_id, user_id):
     return ques.data['png_field'], ques.data['teacher_score']
 
 
-def GetSightsingingInfo(part_id, user_id):
-    ques = SightsingingRecord.objects.filter(part_id=part_id).filter(Q(user=user_id) | Q(coop_user=user_id)).first()
+def GetSightsingingInfo(recordId):
+    ques = SightsingingRecord.objects.get(id=recordId)
     ques = SightsingingSerializer(ques)
-    print(part_id, user_id)
     return ques.data
 
 
@@ -82,30 +78,31 @@ class SightsingingList(APIView):
         try:
             part_id = request.data['part_id']
             audio = request.data['audio']
+            quesType = request.data['quesType']
         except:
             return Response("数据验证未通过！需要part_id和audio字段！", status=status.HTTP_400_BAD_REQUEST)
         # 向SightsingingRecord中存储数据
-        data = {'part_id': part_id, 'audio': audio, 'user': userId}
-        print(part_id[12])
-        if part_id[12] != '0':
+        data = {'part_id': part_id, 'audio': audio, 'user': userId, 'ques_type': quesType}
+        # 双声部需要添加合作者信息
+        if part_id[2] == '3':
             data['coop_user'] = request.data['coopStudentInfo']['user']
         print(data)
         verify_data = SightsingingSerializer(data=data)
         if verify_data.is_valid():
-            verify_data.save()
+            save = verify_data.save()
+            recordId = SightsingingSerializer(instance=save).data['id']
         else:
             print(verify_data.data)
             return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
         print("log:向SightsingingRecord中存储数据成功")
 
         # 向quesGroup中存储数据
-        quesDetail = SightsingingQuestion.objects.get(part_id=part_id)
-        quesDetailSerialized = SightsingingInfo(quesDetail)
-        title_text = {'0': '视唱', '3': '练耳选择题', '4': '练耳听写题'}
-        title = title_text[part_id[0]] + '-' + quesDetailSerialized.data['part_name']
+        title_text = {'1': '视唱-单声部精唱', '2': '视唱-单声部视谱即唱', '3': '视唱-双声部'}
+        title = title_text[part_id[2]]
         data = {'group_part_id': part_id[:-2], 'group_title': title, 'lesson_No': part_id[-3], 'state': 0,
-                'user': userId}
-        if part_id[12] != '0':
+                'user': userId, 'record_id': recordId}
+        # 双声部需要添加合作者信息
+        if part_id[2] == '3':
             data['coop_user'] = request.data['coopStudentInfo']['user']
 
         verify_data = QuesGroupSerializer(data=data)

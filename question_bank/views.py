@@ -39,8 +39,7 @@ class SightsingingList(APIView):
 
         quesDec = {'单声部精唱': '本道题为单声部视唱题目，学生需要根据乐谱唱出对应单声部曲目',
                    '单声部视谱即唱': '本道题为单声部视唱题目，学生需要根据乐谱唱出对应单声部曲目',
-                   '双声部-低声部': '本道题为双声部视唱题目，学生需要根据乐谱同时配合范例音唱出对应低声部的部分',
-                   '双声部-高声部': '本道题为双声部视唱题目，学生需要根据乐谱同时配合范例音唱出对应高声部的部分'}
+                   '双声部': '本道题为双声部视唱题目，学生需要寻找另一名同学组队配合完成双声部题目的演唱'}
 
         for index, ques in enumerate(data):
             audioInfo = AudioDetail.objects.get(part_id=ques['part_id'])
@@ -52,7 +51,7 @@ class SightsingingList(APIView):
             ques['description'] = quesDec[ques['part_name']]
             ques['note'] = 4
             ques['beat'] = 4
-            ques['bpm'] = 70
+            ques['bpm'] = int(ques['audio_path'][-6:-4])
 
             data[index] = ques
 
@@ -76,6 +75,7 @@ class SightsingingDetail(APIView):
         studentInfo = getStudentInfo(userId)
 
         part_id = request.query_params['part_id']
+        recordId = request.query_params['recordId']
         ques = SightsingingQuestion.objects.get(part_id=part_id)
         serializer = SightsingingSerializer(ques)
         data = serializer.data
@@ -84,16 +84,20 @@ class SightsingingDetail(APIView):
         audio_info = AudioDetailSerializer(audioInfo)
 
         data['audio_detail'] = audio_info.data
-        sightsingingInfo = GetSightsingingInfo(data['part_id'], userId)
-        print(sightsingingInfo)
+        sightsingingInfo = GetSightsingingInfo(recordId)
         data['userAudio'] = sightsingingInfo['audio']
         data['score'] = sightsingingInfo['teacher_score']
+        data['quesType'] = sightsingingInfo['ques_type']
+        # 双声部需添加合作者信息
+        if data['part_id'][2] == '3':
+            coopStudentInfo = getStudentInfo(sightsingingInfo['coop_user'])
+            data['coop_user'] = coopStudentInfo['name']
 
         state = GetState(data['part_id'][:-2], userId, studentInfo['id'])
         data['state'] = state
         data['note'] = 4
         data['beat'] = 4
-        data['bpm'] = 70
+        data['bpm'] = int(data['audio_path'][-6:-4])
 
         return Response({'result': data})
 
