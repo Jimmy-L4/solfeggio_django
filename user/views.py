@@ -132,9 +132,9 @@ class StudentInfo(APIView):
         except:
             # 未登录
             return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
-        print(request.query_params)
         studentId = request.query_params['studentId']
-        userInfo = Student.objects.filter(id=studentId).first()
+        courseId = request.query_params['courseId']
+        userInfo = Student.objects.filter(id=studentId, course=courseId).first()
         if userInfo is None:
             return Response('未搜索到学生，请核对学号是否正确！', status=status.HTTP_400_BAD_REQUEST)
         serializer = StudentSerializer(userInfo)
@@ -158,7 +158,6 @@ class UserNav(APIView):
 
         # 查看用户身份
         # 教师
-        print(userSerializer.data)
         if userSerializer.data['groups'][0] == 1:
             userInfo = Teacher.objects.get(user=userSerializer.data['id'])
             serializer = TeacherSerializer(userInfo)
