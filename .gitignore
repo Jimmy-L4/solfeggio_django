@@ -7,3 +7,5 @@ gen
 /media/json/*
 /media/png/*
 /media/audio/*
+
+/solfeggio_django/settings.py
