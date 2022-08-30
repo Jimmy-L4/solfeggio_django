@@ -19,7 +19,7 @@ from homework.views import GetState, GetChoiceInfo, GetDictationInfo, GetSightsi
 
 # 根据范例音文件地址匹配节拍器速度
 def getBpm(path):
-    return int(re.split('_|.mp3', path)[-2])
+    return int(re.split('_|.mp3|-', path)[-2])
 
 
 # 视唱题列表
@@ -58,7 +58,7 @@ class SightsingingList(APIView):
             ques['description'] = quesDec[ques['part_name']]
             ques['note'] = 4
             ques['beat'] = 4
-            ques['bpm'] = int(ques['audio_path'][-6:-4])
+            ques['bpm'] = getBpm(ques['audio_path'])
 
             data[index] = ques
 
