@@ -34,7 +34,7 @@ class SightsingingList(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         studentInfo = getStudentInfo(userId)
 
@@ -77,7 +77,7 @@ class SightsingingDetail(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         studentInfo = getStudentInfo(userId)
 
@@ -122,7 +122,7 @@ class ChoiceList(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         studentInfo = getStudentInfo(userId)
 
@@ -183,7 +183,7 @@ class ChoiceDetail(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
 
         # 因为这里获取的是一组题目，不同小题的part_id不同，但只有最后一位num不同，这里采用startswith模糊查找
@@ -230,7 +230,7 @@ class DictationList(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         studentInfo = getStudentInfo(userId)
 
@@ -281,7 +281,7 @@ class DictationDetail(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
 
         # 因为这里获取的是一组题目，不同小题的part_id不同，但只有最后一位num不同，这里采用startswith模糊查找

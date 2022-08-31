@@ -50,7 +50,7 @@ class UserInfo(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
 
         # 查看用户身份
         # 教师
@@ -104,7 +104,7 @@ class UserInfo(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userInfo = Student.objects.get(user=userSerializer.data['id'])
         serializer = StudentSerializer(userInfo)
         info = serializer.data
@@ -131,7 +131,7 @@ class StudentInfo(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         studentId = request.query_params['studentId']
         courseId = request.query_params['courseId']
         userInfo = Student.objects.filter(id=studentId, course=courseId).first()
@@ -154,7 +154,7 @@ class UserNav(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
 
         # 查看用户身份
         # 教师
@@ -425,5 +425,5 @@ class Logout(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         return Response('退出登录成功', status=status.HTTP_200_OK)

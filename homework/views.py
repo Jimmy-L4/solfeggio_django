@@ -72,7 +72,7 @@ class SightsingingList(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
 
         try:
@@ -129,7 +129,7 @@ class ChoiceList(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         sumScore = 0
         try:
@@ -190,7 +190,7 @@ class DictationList(APIView):
             userSerializer = UserSerializer(user)
         except:
             # 未登录
-            return Response("用户未登录！", status=status.HTTP_403_FORBIDDEN)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         try:
             field = request.data['field']
