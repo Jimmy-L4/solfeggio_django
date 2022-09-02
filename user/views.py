@@ -10,6 +10,7 @@ from manager.views import getDeadline, getValidLessons, getLesson_No
 
 from user.models import Student, Teacher, Class, Course
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 from user.serializers import StudentSerializer, TeacherSerializer, CourseSerializer, ClassSerializer, UserSerializer
 from user.permissions import IsAdminUserOrReadOnly
 
@@ -427,3 +428,28 @@ class Logout(APIView):
             # 未登录
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         return Response('退出登录成功', status=status.HTTP_200_OK)
+
+
+class ChangePass(APIView):
+    def post(self, request):
+        try:
+            user = request.user
+            if user.username == '':
+                raise Exception("用户必须登录")
+            userSerializer = UserSerializer(user)
+        except:
+            # 未登录
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+        password = request.data['password']
+        new_password = request.data['newPassword']
+        auth = authenticate(username=user.username, password=password)
+        print(user.username)
+        print(auth)
+        if auth is not None:
+            u = User.objects.get(username=user.username)
+            u.set_password(new_password)
+            u.save()
+            # 重定向到一个页面
+            return Response('设置密码成功', status=status.HTTP_200_OK)
+        else:
+            return Response('设置密码失败', status=status.HTTP_403_FORBIDDEN)
