@@ -1,7 +1,7 @@
 import datetime
 
 # 学习开始时间(必须是星期一)
-openingTime = datetime.datetime(2022, 8, 1)
+openingTime = datetime.datetime(2022, 10, 3)
 
 
 # 根据学期开始日期计算课次
@@ -13,7 +13,9 @@ def getLesson_No():
 
     weeks = (week_end_year - week_start_year) * year_week_num + int(timeNow.strftime("%W")) - int(
         openingTime.strftime("%W"))
-    Lesson_No = weeks // 2 + 1
+    # Lesson_No = weeks // 2 + 1
+    # 改变记录课次方式，改为一周一个课次
+    Lesson_No = weeks + 1
     if Lesson_No >= 8:
         Lesson_No = 8
     print('当前课次:', Lesson_No)
@@ -22,9 +24,9 @@ def getLesson_No():
 
 def getDeadline():
     # 课次所用天数
-    lessonDay = datetime.timedelta(days=(getLesson_No() - 1) * 14)
+    lessonDay = datetime.timedelta(days=(getLesson_No() - 1) * 7)
     # 当前课次的第一个周五中午12点截止
-    deadline = openingTime + lessonDay + datetime.timedelta(days=7, hours=12)
+    deadline = openingTime + lessonDay + datetime.timedelta(days=4, hours=16)
     return deadline
 
 
@@ -36,7 +38,7 @@ def getValidLessons(student_id):
     validList = [0, 0, 0, 0, 0, 0, 0, 0]
     # 课次所用天数
     lesson_No = getLesson_No()
-    lessonDay = datetime.timedelta(days=(lesson_No - 1) * 14)
+    lessonDay = datetime.timedelta(days=(lesson_No - 1) * 7)
     startLine = openingTime + lessonDay + datetime.timedelta(days=startDay - 1)
     for i in range(lesson_No - 1):
         validList[i] = -1

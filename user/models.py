@@ -42,7 +42,7 @@ class Course(models.Model):
 # 学生
 class Student(models.Model):
     # 用户id(user的外键)
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='student_user')
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='student_user')
     # 学号
     id = models.BigIntegerField(primary_key=True)
     # 姓名

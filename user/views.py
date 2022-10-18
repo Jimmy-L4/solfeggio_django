@@ -1,18 +1,17 @@
-from datetime import datetime
-
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
-from django.http import Http404
-
 from manager.views import getDeadline, getValidLessons, getLesson_No
 
 from user.models import Student, Teacher, Class, Course
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from user.serializers import StudentSerializer, TeacherSerializer, CourseSerializer, ClassSerializer, UserSerializer
 from user.permissions import IsAdminUserOrReadOnly
+
+from solfeggio_django.settings import SECRET_KEY
+import hashlib
 
 
 # 获取学生课程信息
@@ -74,7 +73,8 @@ class UserInfo(APIView):
             data['course'] = courseSerializer.data
             # 目前版本的权限并未进行设置
             data['roleId'] = 'student'
-            data['role'] = {'id': 'student', 'name': '学生', 'describe': '拥有所有权限', 'status': 1, 'creatorId': 'system',
+            data['role'] = {'id': 'student', 'name': '学生', 'describe': '拥有所有权限', 'status': 1,
+                            'creatorId': 'system',
                             'createTime': 1497160610259, 'deleted': 0,
                             'permissions': [
                                 {
@@ -118,9 +118,33 @@ class UserInfo(APIView):
             # 序列化器将持有的数据反序列化后，
             # 保存到数据库中
             verify_data.save()
-            return Response(verify_data.data)
+            return Response(verify_data.data, status=status.HTTP_200_OK)
         print(verify_data.errors)
         return Response(verify_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        studentId = request.data['studentId']
+        newPassword = request.data['newPassword']
+        user = User.objects.create_user(studentId, password=newPassword)
+        stuGroup = Group.objects.get(id=2)
+        user.groups.add(stuGroup)
+        user.save()
+
+        userInfo = Student.objects.get(id=studentId)
+        stuInfo = StudentSerializer(userInfo)
+        info = stuInfo.data
+        info.update({'user': user.id})
+        verify_data = StudentSerializer(instance=userInfo, data=info)
+        # 验证提交的数据是否合法
+        # 不合法则返回400
+
+        if verify_data.is_valid():
+            # 序列化器将持有的数据反序列化后，
+            # 保存到数据库中
+            verify_data.save()
+            return Response('设置密码成功', status=status.HTTP_200_OK)
+        print(verify_data.errors)
+        return Response('设置密码失败', status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudentInfo(APIView):
@@ -452,4 +476,27 @@ class ChangePass(APIView):
             # 重定向到一个页面
             return Response('设置密码成功', status=status.HTTP_200_OK)
         else:
-            return Response('设置密码失败', status=status.HTTP_403_FORBIDDEN)
+            return Response('设置密码失败：原密码错误！', status=status.HTTP_403_FORBIDDEN)
+
+
+class VerifyMd5(APIView):
+    def post(self, request):
+        studentId = request.data['studentId']
+        verificationCode = request.data['verificationCode']
+        # 注意这里filter返回的数组，与get不同
+        userInfo = Student.objects.filter(id=studentId)
+        if len(userInfo) == 0:
+            return Response('学号不存在！', status=status.HTTP_400_BAD_REQUEST)
+        else:
+            studentInfo = StudentSerializer(userInfo[0])
+            if studentInfo.data['user'] is not None:
+                return Response('用户已经激活，请使用学号密码进行登录', status=status.HTTP_400_BAD_REQUEST)
+
+            hl = hashlib.md5()
+            hl.update((studentId + '$' + SECRET_KEY).encode("utf-8"))
+
+            print(hl.hexdigest()[:5])
+            if verificationCode == hl.hexdigest()[:5]:
+                return Response('验证码验证通过，请设置账号密码', status=status.HTTP_200_OK)
+            else:
+                return Response('验证码不正确，请仔细核对！', status=status.HTTP_400_BAD_REQUEST)

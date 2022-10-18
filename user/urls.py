@@ -10,5 +10,7 @@ urlpatterns = [
     path('student_info/', views.StudentInfo.as_view(), name='studentInfo'),
     path('nav/', views.UserNav.as_view(), name='userNav'),
     path('change_pass/', views.ChangePass.as_view(), name='changePass'),
+    path('verify_code/', views.VerifyMd5.as_view(), name='verifyMd5'),
+
 
 ]
