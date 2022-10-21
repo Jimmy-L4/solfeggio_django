@@ -1,7 +1,7 @@
 import datetime
 
 # 学习开始时间(必须是星期一)
-openingTime = datetime.datetime(2022, 10, 3)
+openingTime = datetime.datetime(2022, 10, 17)
 
 
 # 根据学期开始日期计算课次
@@ -26,11 +26,13 @@ def getDeadline():
     # 课次所用天数
     lessonDay = datetime.timedelta(days=(getLesson_No() - 1) * 7)
     # 当前课次的第一个周五中午12点截止
-    deadline = openingTime + lessonDay + datetime.timedelta(days=4, hours=16)
+    deadline = openingTime + lessonDay + datetime.timedelta(days=4, hours=17)
     return deadline
 
 
 def getValidLessons(student_id):
+    # 甲方要求全部题目开放
+    return [1, 1, 1, 1, 1, 1, 1, 1]
     # 先获取学生信息
     from user.views import getCourseInfo
     courseInfo = getCourseInfo(student_id)

@@ -11,7 +11,7 @@ from user.serializers import StudentSerializer
 
 
 def CreateImg(text, studentId):
-    fontSize = 400
+    fontSize = 800
     liens = text.split('\n')
     # 画布颜色
     colors = ['#8139fd', '#00d6ba', '#fc9826', '#3b75fb']
@@ -23,8 +23,8 @@ def CreateImg(text, studentId):
 
     font = ImageFont.truetype(fontPath, fontSize)
     # 文字颜色
-    dr.text((100, 300), text, font=font, fill="#FFFFFF")
-    im.save(r'../../media/avatar/%s.png' % studentId)
+    dr.text((100, 100), text, font=font, fill="#FFFFFF")
+    im.save(r'../../media/image/%s.png' % studentId)
 
 
 def getStudents():
@@ -53,5 +53,5 @@ def getStudents():
 
 
 if __name__ == '__main__':
-    getStudents()
-    # CreateImg('崇明', '2021111708')
+    # getStudents()
+    CreateImg('写', 'dictation1')
