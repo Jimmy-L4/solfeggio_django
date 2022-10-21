@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 # 教师
 class Teacher(models.Model):
     # 用户id(user的外键)
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='teacher_user')
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='teacher_user')
     # 教工号
     id = models.CharField(max_length=100, primary_key=True)
     # 姓名
@@ -18,6 +18,7 @@ class Teacher(models.Model):
 
 # 班级
 class Class(models.Model):
+    id = models.AutoField(primary_key=True)
     # 班级名称
     name = models.CharField(max_length=100)
 
@@ -47,6 +48,8 @@ class Student(models.Model):
     id = models.BigIntegerField(primary_key=True)
     # 姓名
     name = models.CharField(max_length=100)
+    # 性别
+    gender = models.IntegerField(null=True, blank=True, default=-1)
     # 班级(无法命名为class)
     my_class = models.ForeignKey(Class, null=True, on_delete=models.SET(0), related_name='student_class')
     # 课程
