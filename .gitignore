@@ -15,6 +15,6 @@ gen
 /media/json/*
 /media/png/*
 /media/audio/*
-/common/dataset/*
+/common/dataset/excel/*
 
 /solfeggio_django/settings.py
