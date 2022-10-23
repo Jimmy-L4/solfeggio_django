@@ -238,7 +238,7 @@ class UserNav(APIView):
                     'id': 203,
                     'meta': {
                         'title': '练耳听写题',
-                        'show': True,
+                        'show': False,
                     },
                     'component': 'DictationList',
                 },
