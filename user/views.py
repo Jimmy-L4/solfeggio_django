@@ -419,18 +419,7 @@ class UserNav(APIView):
                         'show': False,
                     },
                     'component': 'DictationResult',
-                },
-                {
-                    'name': 'help',
-                    'parentId': 0,
-                    'id': 1000,
-                    'meta': {
-                        'title': '帮助文档',
-                        'show': False,
-                    },
-                    'component': 'Help',
-
-                },
+                }
 
             ]
             if userSerializer.data['is_superuser']:
