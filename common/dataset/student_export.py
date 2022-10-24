@@ -34,14 +34,39 @@ def get_verificationCode(studentId):
 
 def write_excel(sheet, studentList):
     worksheet = workbook.add_sheet(sheet)
+    worksheet.col(0).width = 256 * 24
+    worksheet.col(1).width = 256 * 24
+    worksheet.col(2).width = 256 * 24
+
+    style = xlwt.XFStyle()  # 创建一个样式对象，初始化样式
+
+    al = xlwt.Alignment()
+    al.horz = 0x02  # 设置水平居中
+    al.vert = 0x01  # 设置垂直居中
+    style.alignment = al
+
+    font = xlwt.Font()
+    font.height = 20 * 18
+    style.font = font
+
+    borders = xlwt.Borders()
+    # 细实线:1，小粗实线:2，细虚线:3，中细虚线:4，大粗实线:5，双线:6，细点虚线:7
+    borders.left = 1
+    borders.right = 1
+    borders.top = 1
+    borders.bottom = 1
+    style.borders = borders
+
     # 行 列 内容
-    worksheet.write(0, 0, label='学生')
-    worksheet.write(0, 1, label='学号')
-    worksheet.write(0, 2, label='验证码')
+    style.font.bold = True
+    worksheet.write(0, 0, '学生', style)
+    worksheet.write(0, 1, '学号', style)
+    worksheet.write(0, 2, '验证码', style)
+    style.font.bold = False
     for i in range(len(studentList)):
-        worksheet.write(i + 1, 0, label=studentList[i]['name'])
-        worksheet.write(i + 1, 1, label=studentList[i]['id'])
-        worksheet.write(i + 1, 2, label=get_verificationCode(studentList[i]['id']))
+        worksheet.write(i + 1, 0, studentList[i]['name'], style)
+        worksheet.write(i + 1, 1, studentList[i]['id'], style)
+        worksheet.write(i + 1, 2, get_verificationCode(studentList[i]['id']), style)
 
 
 if __name__ == '__main__':

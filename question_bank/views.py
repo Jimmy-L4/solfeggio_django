@@ -201,10 +201,11 @@ class ChoiceDetail(APIView):
                 A = dict([(key, ques[i + '_' + key]) for key in ['pic_path', 'xml_path', 'audio_path', 'txt']])
                 answer[i] = A
             body = dict([(key, ques[key]) for key in
-                         ['part_id', 'choice_ans', 'ques_audio_path', 'ques_pic_path', 'ques_xml_path', 'L_ques_txt',
+                         ['part_id', 'ques_audio_path', 'ques_pic_path', 'ques_xml_path', 'L_ques_txt',
                           'ques_txt']])
             body['answer'] = answer
             if withAnswer == '1':
+                body['choice_ans'] = ques['choice_ans']
                 body['userAnswer'], body['score'] = GetChoiceInfo(ques['part_id'], userId)
             else:
                 body['userAnswer'] = -1
