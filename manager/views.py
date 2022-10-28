@@ -32,12 +32,12 @@ def getDeadline():
 
 def getValidLessons(student_id):
     # 甲方要求全部题目开放
-    return [1, 1, 1, 1, 1, 1, 1, 1]
+    # return [1, 1, 1, 1, 1, 1, 1, 1]
     # 先获取学生信息
     from user.views import getCourseInfo
     courseInfo = getCourseInfo(student_id)
     startDay = int(courseInfo['time'][1])
-    validList = [0, 0, 0, 0, 0, 0, 0, 0]
+    validList = [1, 1, 1, 1, 1, 1, 1, 1]
     # 课次所用天数
     lesson_No = getLesson_No()
     lessonDay = datetime.timedelta(days=(lesson_No - 1) * 7)
@@ -45,11 +45,7 @@ def getValidLessons(student_id):
     for i in range(lesson_No - 1):
         validList[i] = -1
 
-    if startLine <= datetime.datetime.now() <= getDeadline():
-        validList[lesson_No - 1] = 1
-    elif startLine > datetime.datetime.now():
-        validList[lesson_No - 1] = 0
-    else:
+    if datetime.datetime.now() > getDeadline():
         validList[lesson_No - 1] = -1
     print('validList:', validList)
 
