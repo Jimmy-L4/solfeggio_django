@@ -1,7 +1,7 @@
 import datetime
 
 # 学习开始时间(必须是星期一)
-openingTime = datetime.datetime(2022, 10, 24)
+openingTime = datetime.datetime(2022, 10, 31)
 
 
 # 根据学期开始日期计算课次

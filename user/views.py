@@ -158,10 +158,10 @@ class StudentInfo(APIView):
             # 未登录
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         studentId = request.query_params['studentId']
-        courseId = request.query_params['courseId']
-        userInfo = Student.objects.filter(id=studentId, course=courseId).first()
+        classId = request.query_params['classId']
+        userInfo = Student.objects.filter(id=studentId, my_class=classId).first()
         if userInfo is None:
-            return Response('未搜索到学生，请核对学号是否正确！', status=status.HTTP_400_BAD_REQUEST)
+            return Response('未搜索到学生，请核对学号是否正确!(合作学生需是同班同学)', status=status.HTTP_400_BAD_REQUEST)
         serializer = StudentSerializer(userInfo)
         response = {'result': serializer.data}
         # 返回 Json 数据
