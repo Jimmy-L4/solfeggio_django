@@ -11,16 +11,11 @@ class Teacher(models.Model):
     id = models.CharField(max_length=100, primary_key=True)
     # 姓名
     name = models.CharField(max_length=100)
+    # 头像
+    avatar = models.TextField(null=True)
 
     def __str__(self):
         return self.name
-
-
-# 班级
-class Class(models.Model):
-    id = models.AutoField(primary_key=True)
-    # 班级名称
-    name = models.CharField(max_length=100)
 
 
 # 课程
@@ -38,6 +33,17 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# 班级
+class Class(models.Model):
+    id = models.AutoField(primary_key=True)
+    # 班级名称
+    name = models.CharField(max_length=100)
+    # 教师
+    teacher = models.ForeignKey(Teacher, null=True, on_delete=models.SET(0), related_name='class_teacher')
+    # 课程
+    course = models.ForeignKey(Course, null=True, on_delete=models.SET(0), related_name='class_course')
 
 
 # 学生

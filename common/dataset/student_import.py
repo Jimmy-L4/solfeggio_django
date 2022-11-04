@@ -27,13 +27,13 @@ def addTeacher(id, name):
         raise Exception("添加Teacher失败！", verify_data.errors)
 
 
-def addClass(name):
+def addClass(name, teacher_id, course_id):
     classObject = Class.objects.filter(name=name)
     if classObject.exists():
         print("此班级已存在，无需重复添加")
         return ClassSerializer(classObject[0]).data['id']
 
-    data = {'name': name}
+    data = {'name': name, 'teacher': teacher_id,'course': course_id}
     verify_data = ClassSerializer(data=data)
     if verify_data.is_valid():
         verify_data.save()
@@ -110,7 +110,11 @@ def readExcel(xlsFile):
     sheet = wb.sheet_by_index(0)  # 通过索引获取表格
     teacher_info = sheet.row_values(7)[:2]
     class_info = sheet.row_values(9)[:1]
+    # 班级信息中添加教师id
+    class_info.append(teacher_info[0])
     course_info = sheet.row_values(11)[:6]
+    # 班级信息中添加课程id
+    class_info.append(course_info[0])
     students_info = []
     for row in range(13, sheet.nrows):
         students_info.append(sheet.row_values(row)[1:4])

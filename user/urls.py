@@ -4,7 +4,7 @@ from user import views
 app_name = 'user'
 
 urlpatterns = [
-    path('', views.UserList.as_view(), name='userList'),
+    path('student_list/', views.StudentList.as_view(), name='studentlist'),
     path('logout/', views.Logout.as_view(), name='logout'),
     path('userinfo/', views.UserInfo.as_view(), name='userInfo'),
     path('student_info/', views.StudentInfo.as_view(), name='studentInfo'),

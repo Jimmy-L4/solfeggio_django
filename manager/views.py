@@ -36,12 +36,10 @@ def getValidLessons(student_id):
     # 先获取学生信息
     from user.views import getCourseInfo
     courseInfo = getCourseInfo(student_id)
-    startDay = int(courseInfo['time'][1])
     validList = [1, 1, 1, 1, 1, 1, 1, 1]
     # 课次所用天数
     lesson_No = getLesson_No()
     lessonDay = datetime.timedelta(days=(lesson_No - 1) * 7)
-    startLine = openingTime + lessonDay + datetime.timedelta(days=startDay - 1)
     for i in range(lesson_No - 1):
         validList[i] = -1
 
