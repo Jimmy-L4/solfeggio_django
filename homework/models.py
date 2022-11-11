@@ -21,6 +21,7 @@ class SightsingingRecord(models.Model):
     rhythm = models.IntegerField(null=True)
     alignment = models.IntegerField(null=True)
     chord = models.IntegerField(null=True)
+    pitch = models.IntegerField(null=True)
 
     def __str__(self):
         return self.part_id

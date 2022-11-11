@@ -120,7 +120,7 @@ class StudentList(APIView):
             totalPage = math.ceil(totalCount / pageSize)
             key = (pageNo - 1) * pageSize
             # 返回数目
-            top_index = totalCount % pageSize if pageNo >= totalPage else pageSize
+            top_index = totalCount % pageSize if pageNo >= totalPage and totalCount % pageSize != 0 else pageSize
 
             result = []
             for index in range(top_index):

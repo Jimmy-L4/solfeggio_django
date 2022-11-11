@@ -33,6 +33,7 @@ urlpatterns = [
     path('api/notice/', include('notice.urls', namespace='notice')),
     path('api/homework/', include('homework.urls', namespace='homework')),
     path('api/question/', include('question_bank.urls', namespace='question')),
+    path('api/workbench/', include('workbench.urls', namespace='workbench')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/router/', include(router.urls)),

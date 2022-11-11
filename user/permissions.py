@@ -13,4 +13,4 @@ class IsAdminUserOrReadOnly(permissions.BasePermission):
             return True
 
         # 仅管理员可进行其他操作
-        return request.user.is_superuser
+        return request.user.is_staff
