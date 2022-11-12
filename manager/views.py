@@ -45,6 +45,7 @@ def getValidLessons(student_id):
 
     if datetime.datetime.now() > getDeadline():
         validList[lesson_No - 1] = -1
+    validList[1] = 1
     print('validList:', validList)
 
     return validList
