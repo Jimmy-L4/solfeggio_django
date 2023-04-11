@@ -1,7 +1,7 @@
 import datetime
 
-# 学习开始时间(必须是星期一)
-openingTime = datetime.datetime(2022, 10, 31)
+# 学习开始时间（必须是星期一）
+openingTime = datetime.datetime(2023, 4, 17)
 
 
 # 根据学期开始日期计算课次
@@ -13,9 +13,14 @@ def getLesson_No():
 
     weeks = (week_end_year - week_start_year) * year_week_num + int(timeNow.strftime("%W")) - int(
         openingTime.strftime("%W"))
+
     # Lesson_No = weeks // 2 + 1
     # 改变记录课次方式，改为一周一个课次
     Lesson_No = weeks + 1
+    # 还没到开始时间
+    if Lesson_No < 1:
+        Lesson_No = 1
+    # 结束了
     if Lesson_No >= 8:
         Lesson_No = 8
     print('当前课次:', Lesson_No)

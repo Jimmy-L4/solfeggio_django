@@ -236,7 +236,9 @@ class QuesGroupList(APIView):
         stateType = ['check-circle', 'clock-circle']
         userId = request.query_params['userId']
         lesson_No = request.query_params['lesson_No']
-        QuesList = QuesGroupRecord.objects.filter(lesson_No=lesson_No).filter(
+        grade = request.query_params['grade']
+        group_end_with = grade + '0' + lesson_No
+        QuesList = QuesGroupRecord.objects.filter(group_part_id__endswith=group_end_with).filter(
             Q(user=userId) | Q(coop_user=userId)).order_by('-record_time')
         serializer = QuesGroupSerializer(QuesList, many=True)
         data = []
