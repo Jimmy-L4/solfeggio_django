@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django_q.tasks import async_task
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, viewsets
@@ -9,9 +10,8 @@ from homework.serializers import SightsingingSerializer, ChoiceSerializer, Dicta
 # 用户
 from user.serializers import UserSerializer
 # 题库
-from question_bank.models import ChoiceQuestion, SightsingingQuestion, DictationQuestion
+from question_bank.models import ChoiceQuestion, DictationQuestion
 from question_bank.serializers import ChoiceSerializer as ChoiceInfo
-from question_bank.serializers import SightsingingSerializer as SightsingingInfo
 from question_bank.serializers import DictationSerializer as DictationInfo
 
 # 课时状态
@@ -110,6 +110,9 @@ class SightsingingList(APIView):
             return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
 
         print('上传作业成功')
+        # 开启异步转换mp3
+        async_task('message_queue.tasks.convert_to_mp3', recordId, audio)
+
         return Response('上传作业成功', status=status.HTTP_200_OK)
         # 向quesGroup中存储数据
 
@@ -173,7 +176,6 @@ class ChoiceList(APIView):
             return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
         print('上传作业成功')
         return Response('上传作业成功', status=status.HTTP_200_OK)
-
 
 class DictationList(APIView):
     def get(self, request):
