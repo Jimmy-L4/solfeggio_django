@@ -19,4 +19,4 @@ gen
 /common/dataset/excel/*
 
 /solfeggio_django/settings.py
-/frontend/dist/*
+/collected_static/*
