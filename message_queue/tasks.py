@@ -16,7 +16,7 @@ from homework.models import SightsingingRecord
 
 def convert_to_mp3(recordId, audioPath):
     record_instance = SightsingingRecord.objects.get(id=recordId)
-    if not audioPath.endWith(".wav"):
+    if not audioPath.endswith(".wav"):
         print("文件路径错误！" + audioPath)
         return
     wav_path = 'media/' + audioPath.split('/media/')[1]
