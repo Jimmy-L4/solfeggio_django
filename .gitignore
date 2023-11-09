@@ -20,3 +20,4 @@ gen
 
 /solfeggio_django/settings.py
 /collected_static/*
+/log/*
