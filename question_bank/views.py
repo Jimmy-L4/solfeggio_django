@@ -1,20 +1,19 @@
+import logging
 import re
 
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status, viewsets
 
+from homework.views import GetState, GetChoiceInfo, GetDictationInfo, GetSightsingingInfo
 from question_bank.models import ChoiceQuestion, SightsingingQuestion, DictationQuestion, AudioDetail
 from question_bank.serializers import ChoiceSerializer, SightsingingSerializer, DictationSerializer, \
     AudioDetailSerializer
-
-import random
-
 # 用户
 from user.serializers import UserSerializer
 from user.views import getStudentInfo
 
-from homework.views import GetState, GetChoiceInfo, GetDictationInfo, GetSightsingingInfo
+logger = logging.getLogger("django")
 
 
 # 根据范例音文件地址匹配节拍器速度
@@ -25,21 +24,22 @@ def getBpm(path):
 # 视唱题列表
 class SightsingingList(APIView):
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         try:
             user = request.user
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            lesson_No = request.query_params['lesson_No']
+            grade = request.query_params['grade']
+
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         studentInfo = getStudentInfo(userId)
 
-        lesson_No = request.query_params['lesson_No']
-        grade = request.query_params['grade']
         quesList = SightsingingQuestion.objects.filter(lesson_No=lesson_No, part_rank=grade)
         serializer = SightsingingSerializer(quesList, many=True)
         data = serializer.data
@@ -68,21 +68,22 @@ class SightsingingList(APIView):
 # 视唱题详情
 class SightsingingDetail(APIView):
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         try:
             user = request.user
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            part_id = request.query_params['part_id']
+            recordId = request.query_params['recordId']
+
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         studentInfo = getStudentInfo(userId)
 
-        part_id = request.query_params['part_id']
-        recordId = request.query_params['recordId']
         ques = SightsingingQuestion.objects.get(part_id=part_id)
         serializer = SightsingingSerializer(ques)
         data = serializer.data
@@ -113,21 +114,22 @@ class SightsingingDetail(APIView):
 
 # 练耳选择题列表
 class ChoiceList(APIView):
-    @staticmethod
-    def get(request):
+
+    def get(self, request):
         try:
             user = request.user
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            lesson_No = request.query_params['lesson_No']
+            grade = request.query_params['grade']
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         studentInfo = getStudentInfo(userId)
 
-        lesson_No = request.query_params['lesson_No']
-        grade = request.query_params['grade']
         quesList = ChoiceQuestion.objects.filter(lesson_No=lesson_No, choice_rank=grade)
         serializer = ChoiceSerializer(quesList, many=True)
         data = serializer.data
@@ -164,32 +166,22 @@ class ChoiceList(APIView):
 # 选择题详情
 class ChoiceDetail(APIView):
 
-    @staticmethod
-    def get(request):
-        """
-        重写get请求方法
-        获取选择题一个题组下的所有题目，如音阶下的六道题
-
-        :param request: 请求体
-        :type request: django请求体
-        :returns: 该题组下所有的题目
-        :rtype: json
-        :author Jimmy 2022/07/13
-        """
+    def get(self, request):
         try:
             user = request.user
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            # 因为这里获取的是一组题目，不同小题的part_id不同，但只有最后一位num不同，这里采用startswith模糊查找
+            part_id = request.query_params['part_id'][:-1]
+            # 根据withAnswer判断是否返回用户提交信息
+            withAnswer = request.query_params['withAnswer']
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
 
-        # 因为这里获取的是一组题目，不同小题的part_id不同，但只有最后一位num不同，这里采用startswith模糊查找
-        part_id = request.query_params['part_id'][:-1]
-        # 根据withAnswer判断是否返回用户提交信息
-        withAnswer = request.query_params['withAnswer']
         if part_id == '' or part_id is None:
             return Response("参数类型错误", status=status.HTTP_400_BAD_REQUEST)
         quesList = ChoiceQuestion.objects.filter(part_id__startswith=part_id)
@@ -222,21 +214,22 @@ class ChoiceDetail(APIView):
 
 # 练耳听写题列表
 class DictationList(APIView):
-    @staticmethod
-    def get(request):
+
+    def get(self, request):
         try:
             user = request.user
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            lesson_No = request.query_params['lesson_No']
+            grade = request.query_params['grade']
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         studentInfo = getStudentInfo(userId)
 
-        lesson_No = request.query_params['lesson_No']
-        grade = request.query_params['grade']
         quesList = DictationQuestion.objects.filter(lesson_No=lesson_No, choice_rank=grade)
         serializer = DictationSerializer(quesList, many=True)
         data = serializer.data
@@ -273,24 +266,25 @@ class DictationList(APIView):
 # 听写题详情
 class DictationDetail(APIView):
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         try:
             user = request.user
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            # 因为这里获取的是一组题目，不同小题的part_id不同，但只有最后一位num不同，这里采用startswith模糊查找
+            part_id = request.query_params['part_id'][:-1]
+            # 根据withAnswer判断是否返回用户提交信息
+            withAnswer = request.query_params['withAnswer']
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
 
-        # 因为这里获取的是一组题目，不同小题的part_id不同，但只有最后一位num不同，这里采用startswith模糊查找
-        part_id = request.query_params['part_id'][:-1]
         if part_id == '' or part_id is None:
             return Response("参数类型错误", status=status.HTTP_400_BAD_REQUEST)
-        # 根据withAnswer判断是否返回用户提交信息
-        withAnswer = request.query_params['withAnswer']
+
         quesList = DictationQuestion.objects.filter(part_id__startswith=part_id)
         serializer = DictationSerializer(quesList, many=True)
         data = []

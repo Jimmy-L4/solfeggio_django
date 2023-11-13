@@ -271,7 +271,7 @@ class UserInfo(APIView):
             data['lesson_deadline'] = getDeadline()
             data['vailLessons'] = getValidLessons(serializer.data['id'])
             response = {'result': data}
-            logger.info("%s 学生获取个人信息", data['name'])
+            logger.info("%s 级别学生 %s获取个人信息", courseSerializer.data["grade"], data["name"])
 
         # 返回 Json 数据
         return Response(response)

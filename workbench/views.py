@@ -1,36 +1,37 @@
+import logging
 import math
 
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status, viewsets
 
-from question_bank.models import ChoiceQuestion, SightsingingQuestion, DictationQuestion, AudioDetail
-from question_bank.serializers import ChoiceSerializer, SightsingingSerializer, DictationSerializer, \
-    AudioDetailSerializer
-
-# 用户
-from user.models import Student
-from user.serializers import UserSerializer, StudentSerializer
 # 作业
 from homework.models import QuesGroupRecord, SightsingingRecord
 from homework.serializers import QuesGroupSerializer, SightsingingSerializer as SingRecordSerializer
+from question_bank.models import SightsingingQuestion, AudioDetail
+from question_bank.serializers import SightsingingSerializer, AudioDetailSerializer
+# 用户
+from user.models import Student
+from user.serializers import UserSerializer, StudentSerializer
+
+logger = logging.getLogger("django")
 
 
 # 视唱题详情
 class SingDetail(APIView):
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         try:
             user = request.user
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            part_id = request.query_params['part_id']
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
 
-        part_id = request.query_params['part_id']
         question_info = SightsingingSerializer(SightsingingQuestion.objects.get(part_id=part_id)).data
 
         audio_info = AudioDetailSerializer(AudioDetail.objects.get(part_id=part_id)).data
@@ -42,21 +43,22 @@ class SingDetail(APIView):
 # 提交详情
 class CommitInfo(APIView):
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         try:
             user = request.user
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
-        # 获取参数
-        pageNo = int(request.query_params['pageNo'])
-        pageSize = int(request.query_params['pageSize'])
-        course_list = request.query_params.getlist('course_list[]')
-        part_id = request.query_params['part_id']
+
+            # 获取参数
+            pageNo = int(request.query_params['pageNo'])
+            pageSize = int(request.query_params['pageSize'])
+            course_list = request.query_params.getlist('course_list[]')
+            part_id = request.query_params['part_id']
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
 
         # TODO 测试班级id
         test_class = [4]
@@ -124,11 +126,12 @@ class SingRecord(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            record_id = request.query_params['record_id']
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
 
-        record_id = request.query_params['record_id']
         record = SingRecordSerializer(SightsingingRecord.objects.get(id=record_id)).data
 
         return Response({'result': record})
@@ -139,21 +142,23 @@ class SingRecord(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
-            # 未登录
-            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+            record_id = request.data.get('id')
+            teacher_score = request.data.get('teacher_score')
+        except Exception as e:
+            logger.warning("请求错误")
+            logger.warning("warning %s", e)
+            return Response(str(e), status=status.HTTP_401_UNAUTHORIZED)
 
-        record_id = request.data.get('id')
         # 向QuesGroupRecord中保存成绩
         group_record = QuesGroupRecord.objects.get(record_id=record_id)
         group_info = QuesGroupSerializer(group_record).data
-        score = {'teacher_score': request.data.get('teacher_score')}
+        score = {'teacher_score': teacher_score}
         group_info.update(score)
         verify_group = QuesGroupSerializer(group_record, data=group_info)
         if verify_group.is_valid():
             verify_group.save()
         else:
-            print(verify_group.errors)
+            logger.error("向QuesGroup保存学生视唱成绩错误,recordId:%s", record_id)
             return Response(verify_group.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # 向SightsingingRecord中保存成绩
@@ -166,5 +171,5 @@ class SingRecord(APIView):
             # 保存到数据库中
             verify_data.save()
             return Response(verify_data.data, status=status.HTTP_200_OK)
-        print(verify_data.errors)
+        logger.error("向QuesGroup保存学生视唱成绩错误,recordId:%s error:%s", record_id, str(verify_data.errors))
         return Response(verify_data.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,11 +1,16 @@
-from rest_framework.response import Response
-from rest_framework.views import APIView
+import logging
+
 from django.http import Http404
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from notice.models import Notice
 from notice.serializers import NoticeListSerializer
 from user.permissions import IsAdminUserOrReadOnly
+from user.serializers import UserSerializer
+
+logger = logging.getLogger("django")
 
 
 class NoticeList(APIView):
@@ -24,7 +29,18 @@ class NoticeList(APIView):
             raise Http404
 
     def get(self, request):
-        if request.GET.get('display') == 'true':
+        try:
+            user = request.user
+            if user.username == '':
+                raise Exception("用户必须登录")
+            display = request.query_params['display']
+            userSerializer = UserSerializer(user)
+        except Exception as e:
+            # 未登录
+            logger.warning("尝试获取信息但用户未登录！")
+            logger.warning("warning: %s", str(e))
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
+        if display == 'true':
             notice = Notice.objects.filter(type=1)
         else:
             notice = Notice.objects.filter(type__gte=0)
@@ -42,8 +58,14 @@ class NoticeList(APIView):
         return Response(data)
 
     def put(self, request):
-        id = request.data.get('id')
-        notice = self.get_object(id)
+        try:
+            id = request.query_params['id']
+            notice = self.get_object(id)
+        except Exception as e:
+            logger.warning("修改通知请求参数失败")
+            logger.warning("warning:" + str(e))
+            return Response("参数错误", status=status.HTTP_400_BAD_REQUEST)
+
         serializer = NoticeListSerializer(notice, data=request.data)
         # 验证提交的数据是否合法
         # 不合法则返回400
@@ -52,6 +74,8 @@ class NoticeList(APIView):
             # 保存到数据库中
             serializer.save()
             return Response(serializer.data)
+        logger.error("修改通知失败")
+        logger.error("error:" + str(serializer.errors))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
@@ -63,11 +87,18 @@ class NoticeList(APIView):
             # 保存到数据库中
             serializer.save()
             return Response(serializer.data)
+        logger.error("添加通知失败")
+        logger.error("error:" + str(serializer.errors))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
-        id = request.data.get('id')
-        notice = self.get_object(id)
+        try:
+            id = request.query_params['id']
+            notice = self.get_object(id)
+        except Exception as e:
+            logger.warning("删除通知请求参数失败")
+            logger.warning("warning:" + str(e))
+            return Response("参数错误", status=status.HTTP_400_BAD_REQUEST)
         serializer = NoticeListSerializer(notice, data=request.data)
         # 验证提交的数据是否合法
         # 不合法则返回400
@@ -76,4 +107,6 @@ class NoticeList(APIView):
             # 保存到数据库中
             serializer.save()
             return Response(serializer.data)
+        logger.error("删除通知失败")
+        logger.error("error:" + str(serializer.errors))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
