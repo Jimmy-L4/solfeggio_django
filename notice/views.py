@@ -59,7 +59,7 @@ class NoticeList(APIView):
 
     def put(self, request):
         try:
-            id = request.query_params['id']
+            id = request.data.get('id')
             notice = self.get_object(id)
         except Exception as e:
             logger.warning("修改通知请求参数失败")
@@ -93,7 +93,7 @@ class NoticeList(APIView):
 
     def delete(self, request):
         try:
-            id = request.query_params['id']
+            id = request.data.get('id')
             notice = self.get_object(id)
         except Exception as e:
             logger.warning("删除通知请求参数失败")
