@@ -1,14 +1,24 @@
+# -*- encoding: utf-8 -*-
+"""
+@File    :   online_info_export.py
+@Contact :   licm@bupt.edu.cn
+@License :   (C)Copyright Null
+
+@Modify Time      @Author    @Version    @Description
+------------      -------    --------    -----------
+2023/12/21 18:15   Jimmy.li      1.0     导入学生
+"""
 import os
-from PIL import Image, ImageFont, ImageDraw
 import random
-import xlrd
 
 import django
+import xlrd
+from PIL import Image, ImageFont, ImageDraw
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'solfeggio_django.settings')
 django.setup()
 from user.models import Student, Teacher, Class, Course
-from user.serializers import StudentSerializer, TeacherSerializer, CourseSerializer, ClassSerializer, UserSerializer
+from user.serializers import StudentSerializer, TeacherSerializer, CourseSerializer, ClassSerializer
 
 
 def addTeacher(id, name):
@@ -33,7 +43,7 @@ def addClass(name, teacher_id, course_id):
         print("此班级已存在，无需重复添加")
         return ClassSerializer(classObject[0]).data['id']
 
-    data = {'name': name, 'teacher': teacher_id,'course': course_id}
+    data = {'name': name, 'teacher': teacher_id, 'course': course_id}
     verify_data = ClassSerializer(data=data)
     if verify_data.is_valid():
         verify_data.save()

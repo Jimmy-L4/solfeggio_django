@@ -6,11 +6,8 @@
  
 @Modify Time      @Author    @Version    @Description
 ------------      -------    --------    -----------
-2023/12/21 18:15   Jimmy.li      1.0         None
+2023/12/21 18:15   Jimmy.li      1.0     导出学生在线时间
 """
-# 用于导出excel，导出学生信息
-# 需求：
-# 导出学生成绩
 import os
 
 import pymysql

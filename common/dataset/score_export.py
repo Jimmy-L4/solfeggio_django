@@ -1,6 +1,14 @@
-# 用于导出excel，导出学生信息
-# 需求：
-# 导出学生成绩
+# -*- encoding: utf-8 -*-
+"""
+@File    :   online_info_export.py
+@Contact :   licm@bupt.edu.cn
+@License :   (C)Copyright Null
+
+@Modify Time      @Author    @Version    @Description
+------------      -------    --------    -----------
+2023/12/21 18:15   Jimmy.li      1.0     导出学生成绩
+"""
+
 import os
 
 import numpy as np
