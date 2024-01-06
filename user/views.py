@@ -1,20 +1,21 @@
-import math
-
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-
-from manager.views import getDeadline, getValidLessons, getLesson_No
-
-from user.models import Student, Teacher, Class, Course
-from django.contrib.auth.models import User, Group
-from django.contrib.auth import authenticate, login, logout
-from user.serializers import StudentSerializer, TeacherSerializer, CourseSerializer, ClassSerializer, UserSerializer
-from user.permissions import IsAdminUserOrReadOnly
-
-from solfeggio_django.settings import SECRET_KEY
 import hashlib
 import json
+import logging
+import math
+
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User, Group
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from manager.views import getDeadline, getValidLessons, getLesson_No
+from solfeggio_django.settings import SECRET_KEY
+from user.models import Student, Teacher, Class, Course
+from user.permissions import IsAdminUserOrReadOnly
+from user.serializers import StudentSerializer, TeacherSerializer, CourseSerializer, ClassSerializer, UserSerializer
+
+logger = logging.getLogger('django')
 
 
 # 获取学生课程信息
@@ -31,7 +32,6 @@ def getCourseInfo(student_id):
 def getVerificationCode(student_id):
     hl = hashlib.md5()
     hl.update((str(student_id) + '$' + SECRET_KEY).encode("utf-8"))
-    # print(hl.hexdigest()[:5])
     return hl.hexdigest()[:5]
 
 
@@ -66,8 +66,10 @@ class StudentList(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
+        except Exception as e:
             # 未登录
+            logger.warning("尝试获取信息但用户未登录！")
+            logger.warning("warning: %s", str(e))
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         # 查看用户身份
         # 教师
@@ -96,6 +98,7 @@ class StudentList(APIView):
                          'grade': grade,
                          'courseName': course_name, 'verificationCode': getVerificationCode(student_id)}]
                 result = {'pageSize': pageSize, 'pageNo': pageNo, 'totalCount': 1, 'totalPage': 1, 'data': data}
+                logger.info("教师获取单个学生信息: %s %s", student_id, student_info['name'])
                 return Response(result)
 
             # 查询一个班的学生
@@ -141,8 +144,12 @@ class StudentList(APIView):
 
             response = {'pageSize': pageSize, 'pageNo': pageNo, 'totalCount': totalCount, 'totalPage': totalPage,
                         'data': result}
-
-        return Response(response)
+            logger.info("教师获取班级 %s 学生信息", class_name)
+            return Response(response)
+        # 非教师
+        else:
+            logger.warning("尝试获取学生信息但用户不是教师！")
+            return Response("无权限访问", status=status.HTTP_403_FORBIDDEN)
 
 
 class UserInfo(APIView):
@@ -206,6 +213,7 @@ class UserInfo(APIView):
             data['course_list'] = course_list
             data['class_list'] = getMyClass(teacher_id)
             response = {'result': data}
+            logger.info("%s 教师获取个人信息", data['name'])
 
             # 返回 Json 数据
 
@@ -263,6 +271,7 @@ class UserInfo(APIView):
             data['lesson_deadline'] = getDeadline()
             data['vailLessons'] = getValidLessons(serializer.data['id'])
             response = {'result': data}
+            logger.info("%s 级别学生 %s获取个人信息", courseSerializer.data["grade"], data["name"])
 
         # 返回 Json 数据
         return Response(response)
@@ -273,8 +282,10 @@ class UserInfo(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
+        except Exception as e:
             # 未登录
+            logger.warning("尝试更改信息但用户未登录！")
+            logger.warning("warning: %s", str(e))
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userInfo = Student.objects.get(user=userSerializer.data['id'])
         serializer = StudentSerializer(userInfo)
@@ -288,23 +299,33 @@ class UserInfo(APIView):
             # 序列化器将持有的数据反序列化后，
             # 保存到数据库中
             verify_data.save()
+            logger.info("%s 学生更改信息成功", verify_data.data["name"])
             return Response(verify_data.data, status=status.HTTP_200_OK)
-        print(verify_data.errors)
+        logger.error("%s 学生更改信息失败", verify_data.data)
+        logger.error("error: %s", str(verify_data.errors))
         return Response(verify_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        studentId = request.data['studentId']
-        newPassword = request.data['newPassword']
+        try:
+            studentId = request.data['studentId']
+            newPassword = request.data['newPassword']
+            userInfo = Student.objects.get(id=studentId)
+            stuInfo = StudentSerializer(userInfo).data
+            if stuInfo["user"] is not None:
+                raise Exception('用户已经绑定，无法创建！')
+        except Exception as e:
+            # 未登录
+            logger.warning("添加用户信息参数错误")
+            logger.warning("warning: %s", str(e))
+            return Response("参数错误", status=status.HTTP_400_BAD_REQUEST)
+
         user = User.objects.create_user(studentId, password=newPassword)
         stuGroup = Group.objects.get(id=2)
         user.groups.add(stuGroup)
         user.save()
 
-        userInfo = Student.objects.get(id=studentId)
-        stuInfo = StudentSerializer(userInfo)
-        info = stuInfo.data
-        info.update({'user': user.id})
-        verify_data = StudentSerializer(instance=userInfo, data=info)
+        stuInfo.update({'user': user.id})
+        verify_data = StudentSerializer(instance=userInfo, data=stuInfo)
         # 验证提交的数据是否合法
         # 不合法则返回400
 
@@ -312,8 +333,10 @@ class UserInfo(APIView):
             # 序列化器将持有的数据反序列化后，
             # 保存到数据库中
             verify_data.save()
+            logger.info("%s 新建用户成功", stuInfo["name"])
             return Response('设置密码成功', status=status.HTTP_200_OK)
-        print(verify_data.errors)
+        logger.error("%s 新建用户失败", stuInfo["name"])
+        logger.error("error: ", str(verify_data.errors))
         return Response('设置密码失败', status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -324,17 +347,21 @@ class StudentInfo(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
+            studentId = request.query_params['studentId']
+            classId = request.query_params['classId']
+        except Exception as e:
             # 未登录
+            logger.warning("尝试获取信息失败！")
+            logger.warning("warning: %s", str(e))
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
-        studentId = request.query_params['studentId']
-        classId = request.query_params['classId']
+
         if userSerializer.data['username'] in ['22710015', '22020389', '17020223',
                                                'solfeggio'] and studentId == '202204':
             userInfo = Student.objects.filter(id=studentId).first()
         else:
             userInfo = Student.objects.filter(id=studentId, my_class=classId).first()
         if userInfo is None:
+            logger.warning("%s 学生搜索学生 %s 失败", userSerializer.data['username'], studentId)
             return Response('未搜索到学生，请核对学号是否正确!(合作学生需是同班同学)',
                             status=status.HTTP_400_BAD_REQUEST)
         serializer = StudentSerializer(userInfo)
@@ -352,8 +379,10 @@ class UserNav(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
+        except Exception as e:
             # 未登录
+            logger.warning("尝试导航信息失败！")
+            logger.warning("warning: %s", str(e))
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         # 获取导航信息
         student_nav, teacher_nav = read_json_nav()
@@ -405,14 +434,14 @@ class ChangePass(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
+            password = request.data['password']
+            new_password = request.data['newPassword']
+        except Exception as e:
             # 未登录
+            logger.warning("尝试更改密码失败！")
+            logger.warning("warning: %s", str(e))
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
-        password = request.data['password']
-        new_password = request.data['newPassword']
         auth = authenticate(username=user.username, password=password)
-        print(user.username)
-        print(auth)
         if auth is not None:
             u = User.objects.get(username=user.username)
             u.set_password(new_password)
@@ -425,8 +454,13 @@ class ChangePass(APIView):
 
 class VerifyMd5(APIView):
     def post(self, request):
-        studentId = request.data['studentId']
-        verificationCode = request.data['verificationCode']
+        try:
+            studentId = request.data['studentId']
+            verificationCode = request.data['verificationCode']
+        except Exception as e:
+            logger.warning("验证码验证失败！")
+            logger.warning("warning: %s", str(e))
+            return Response("参数错误", status=status.HTTP_400_BAD_REQUEST)
         # 注意这里filter返回的数组，与get不同
         userInfo = Student.objects.filter(id=studentId)
         if len(userInfo) == 0:

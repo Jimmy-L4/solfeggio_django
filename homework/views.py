@@ -1,21 +1,24 @@
+import logging
+
 from django.db.models import Q
 from django_q.tasks import async_task
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status, viewsets
 
 from homework.models import SightsingingRecord, ChoiceRecord, DictationRecord, QuesGroupRecord, Audio, Json, Png
 from homework.serializers import SightsingingSerializer, ChoiceSerializer, DictationSerializer, QuesGroupSerializer, \
     AudioSerializer, JsonSerializer, PngSerializer
-# 用户
-from user.serializers import UserSerializer
+# 课时状态
+from manager.views import getValidLessons
 # 题库
 from question_bank.models import ChoiceQuestion, DictationQuestion
 from question_bank.serializers import ChoiceSerializer as ChoiceInfo
 from question_bank.serializers import DictationSerializer as DictationInfo
+# 用户
+from user.serializers import UserSerializer
 
-# 课时状态
-from manager.views import getValidLessons
+logger = logging.getLogger('django')
 
 
 # 获取题组状态
@@ -59,10 +62,7 @@ def GetSightsingingInfo(recordId):
 class SightsingingList(APIView):
 
     def get(self, request):
-        user = SightsingingRecord.objects.all()
-        serializer = SightsingingSerializer(user, many=True)
-        # 返回 Json 数据
-        return Response(serializer.data)
+        return Response("接口未开放", status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         try:
@@ -70,8 +70,10 @@ class SightsingingList(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
+        except Exception as e:
             # 未登录
+            logger.warning("用户未登录，但尝试提交")
+            logger.warning("warning %s", e)
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
 
@@ -79,8 +81,11 @@ class SightsingingList(APIView):
             part_id = request.data['part_id']
             audio = request.data['audio']
             quesType = request.data['quesType']
-        except:
+        except Exception as e:
+            logger.warning("参数错误")
+            logger.warning("warning %s", e)
             return Response("数据验证未通过！需要part_id和audio字段！", status=status.HTTP_400_BAD_REQUEST)
+
         # 向SightsingingRecord中存储数据
         data = {'part_id': part_id, 'audio': audio, 'user': userId, 'ques_type': quesType}
         # 双声部需要添加合作者信息
@@ -91,8 +96,9 @@ class SightsingingList(APIView):
             save = verify_data.save()
             recordId = SightsingingSerializer(instance=save).data['id']
         else:
+            logger.warning("%s 向SightsingingRecord中存储数据失败", userSerializer.data['username'])
             return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
-        print("log:向SightsingingRecord中存储数据成功")
+        logger.info("%s 向SightsingingRecord中存储数据成功", userSerializer.data['username'])
 
         # 向quesGroup中存储数据
         title_text = {'1': '视唱-单声部精唱', '2': '视唱-单声部视谱即唱', '3': '视唱-双声部'}
@@ -107,10 +113,12 @@ class SightsingingList(APIView):
         if verify_data.is_valid():
             verify_data.save()
         else:
+            logger.warning("%s 向quesGroup中存储数据失败", userSerializer.data['username'])
             return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
 
-        print('上传作业成功')
+        logger.info("%s 向quesGroup中存储数据成功", userSerializer.data['username'])
         # 开启异步转换mp3
+        logger.info("开启异步转换MP3,recordId:%s audio:%s", recordId, audio)
         async_task('message_queue.tasks.convert_to_mp3', recordId, audio)
 
         return Response('上传作业成功', status=status.HTTP_200_OK)
@@ -119,10 +127,7 @@ class SightsingingList(APIView):
 
 class ChoiceList(APIView):
     def get(self, request):
-        user = ChoiceRecord.objects.all()
-        serializer = ChoiceSerializer(user, many=True)
-        # 返回 Json 数据
-        return Response(serializer.data)
+        return Response("接口未开放", status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         try:
@@ -130,8 +135,10 @@ class ChoiceList(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
+        except Exception as e:
             # 未登录
+            logger.warning("用户未登录，但尝试提交")
+            logger.warning("warning %s", e)
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         sumScore = 0
@@ -139,7 +146,9 @@ class ChoiceList(APIView):
             answerInfo = request.data['answerInfo']
             lesson_No = request.data['lesson_No']
             groupPart_id = request.data['groupPart_id']
-        except:
+        except Exception as e:
+            logger.warning("请求参数错误")
+            logger.warning("warning %s", e)
             return Response("数据验证未通过！需要answerInfo、lesson_No和groupPart_id字段！", status=status.HTTP_400_BAD_REQUEST)
         # 向choiceRecord中存储数据
         for ques in answerInfo:
@@ -156,11 +165,12 @@ class ChoiceList(APIView):
             data = {'part_id': part_id, 'response': userAnswer, 'score': score, 'user': userId}
             verify_data = ChoiceSerializer(data=data)
             if verify_data.is_valid():
-
                 verify_data.save()
             else:
+                logger.warning("%s 向choiceRecord中存储数据失败", userSerializer.data['username'])
                 return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
-        print("log:向choiceRecord中存储数据成功")
+        logger.info("%s 向choiceRecord中存储数据成功", userSerializer.data['username'])
+
         # 向quesGroup中存储数据
         quesDetail = ChoiceQuestion.objects.get(part_id=groupPart_id + '01')
         quesDetailSerialized = ChoiceInfo(quesDetail)
@@ -173,16 +183,15 @@ class ChoiceList(APIView):
         if verify_data.is_valid():
             verify_data.save()
         else:
+            logger.warning("%s 向quesGroup中存储数据失败", userSerializer.data['username'])
             return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
-        print('上传作业成功')
+        logger.info("%s 向quesGroup中存储数据成功", userSerializer.data['username'])
         return Response('上传作业成功', status=status.HTTP_200_OK)
+
 
 class DictationList(APIView):
     def get(self, request):
-        user = DictationRecord.objects.all()
-        serializer = DictationSerializer(user, many=True)
-        # 返回 Json 数据
-        return Response(serializer.data)
+        return Response("接口未开放", status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         try:
@@ -190,31 +199,39 @@ class DictationList(APIView):
             if user.username == '':
                 raise Exception("用户必须登录")
             userSerializer = UserSerializer(user)
-        except:
+        except Exception as e:
             # 未登录
+            logger.warning("用户未登录，但尝试提交")
+            logger.warning("warning %s", e)
             return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         userId = userSerializer.data['id']
         try:
             field = request.data['field']
             groupPart_id = request.data['groupPart_id']
             lesson_No = request.data['lesson_No']
-        except:
-            return Response("数据验证未通过！需要answerInfo、lesson_No和groupPart_id字段！", status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.warning("参数错误")
+            logger.warning("warning %s", e)
+            return Response("数据验证未通过！field、lesson_No和groupPart_id字段！", status=status.HTTP_400_BAD_REQUEST)
+
         # 向choiceRecord中存储数据
         for ques in field:
             try:
                 part_id = ques['part_id']
                 json_field = ques['json']
                 png_field = ques['png']
-            except:
+            except Exception as e:
+                logger.warning("参数错误")
+                logger.warning("warning %s", e)
                 return Response("数据验证未通过！需要part_id和json字段！", status=status.HTTP_400_BAD_REQUEST)
             data = {'part_id': part_id, 'json_field': json_field, 'png_field': png_field, 'user': userId}
             verify_data = DictationSerializer(data=data)
             if verify_data.is_valid():
                 verify_data.save()
             else:
+                logger.warning("%s 向choiceRecord存储数据失败", userSerializer.data['username'])
                 return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
-        print("log:向choiceRecord中存储数据成功")
+        logger.info("%s 向choiceRecord存储数据成功", userSerializer.data['username'])
         # 向quesGroup中存储数据
         quesDetail = DictationQuestion.objects.get(part_id=groupPart_id + '01')
         quesDetailSerialized = DictationInfo(quesDetail)
@@ -227,18 +244,29 @@ class DictationList(APIView):
         if verify_data.is_valid():
             verify_data.save()
         else:
+            logger.warning("%s 向quesGroup中存储数据失败", userSerializer.data['username'])
             return Response("数据验证未通过", status=status.HTTP_400_BAD_REQUEST)
-        print('上传作业成功')
+        logger.info("%s 向quesGroup中存储数据成功", userSerializer.data['username'])
         return Response('上传作业成功', status=status.HTTP_200_OK)
 
 
 class QuesGroupList(APIView):
     def get(self, request):
+        try:
+            user = request.user
+            if user.username == '':
+                raise Exception("用户必须登录")
+            userSerializer = UserSerializer(user)
+            userId = request.query_params['userId']
+            lesson_No = request.query_params['lesson_No']
+            grade = request.query_params['grade']
+        except Exception as e:
+            # 未登录
+            logger.warning("用户未登录，但尝试提交")
+            logger.warning("warning %s", e)
+            return Response("用户未登录！", status=status.HTTP_401_UNAUTHORIZED)
         stateText = ['正常提交', '后期补交']
         stateType = ['check-circle', 'clock-circle']
-        userId = request.query_params['userId']
-        lesson_No = request.query_params['lesson_No']
-        grade = request.query_params['grade']
         group_end_with = grade + '0' + lesson_No
         QuesList = QuesGroupRecord.objects.filter(group_part_id__endswith=group_end_with).filter(
             Q(user=userId) | Q(coop_user=userId)).order_by('-record_time')

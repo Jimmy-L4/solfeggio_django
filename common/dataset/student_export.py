@@ -1,13 +1,24 @@
+# -*- encoding: utf-8 -*-
+"""
+@File    :   online_info_export.py
+@Contact :   licm@bupt.edu.cn
+@License :   (C)Copyright Null
+
+@Modify Time      @Author    @Version    @Description
+------------      -------    --------    -----------
+2023/12/21 18:15   Jimmy.li      1.0     导出学生列表及验证码
+"""
 import hashlib
 import os
+
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'solfeggio_django.settings')
 django.setup()
 
-import xlrd, xlwt
-from user.models import Student, Teacher, Class, Course
-from user.serializers import StudentSerializer, TeacherSerializer, CourseSerializer, ClassSerializer, UserSerializer
+import xlwt
+from user.models import Student, Class
+from user.serializers import StudentSerializer, ClassSerializer
 from solfeggio_django.settings import SECRET_KEY
 
 
