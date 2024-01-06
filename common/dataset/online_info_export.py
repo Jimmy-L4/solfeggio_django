@@ -77,19 +77,9 @@ def get_score(data, difficulty):
             else:
                 sing_score_sheet.append(item[4])
 
-                # sing_weights = np.array([[0.3, 0.3, 0.4]])
-    # sing_score_sheet = sing_weights.dot(sing_score_sheet)
-    # sing_score = round(np.mean(sing_score_sheet), 3)
-    # print(sing_score_sheet, sing_score)
-    #
-    # ear_training_score_sheet = np.sum(ear_training_score_sheet, axis=0)
-    # ear_training_score = round(np.mean(np.mean(ear_training_score_sheet)), 3)
-    # print(ear_training_score_sheet, ear_training_score)
-    # score = round(np.mean([ear_training_score, sing_score]), 3)
-    # print(score)
     sing_score_sheet = merge_and_format_dates(sing_score_sheet)
 
-    return sing_score_sheet, 0, ear_training_score_sheet, 0, 0, 0
+    return sing_score_sheet
 
 
 def solfeggio_traversal():
@@ -99,11 +89,6 @@ def solfeggio_traversal():
     sheet.write(0, 1, '姓名')
     sheet.write(0, 2, '班级')
     sheet.write(0, 3, '学生在线时间点')
-    sheet.write(0, 4, '视唱平均分')
-    sheet.write(0, 5, '练耳八课次成绩')
-    sheet.write(0, 6, '练耳平均分')
-    sheet.write(0, 7, '总成绩')
-    sheet.write(0, 8, '总成绩*0.3')
     for difficulty in difficulties:
         student_list = get_student('04')
         print("*" * 40 + '共有' + str(len(student_list)) + '名学生' + "*" * 40)
