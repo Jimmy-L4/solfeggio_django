@@ -9,10 +9,10 @@
 2023/12/21 18:15   Jimmy.li      1.0     导出学生在线时间
 """
 import os
+from datetime import timedelta
 
 import pymysql
 import xlwt
-
 
 conn = pymysql.connect(
     host='62.234.135.208',
@@ -57,6 +57,7 @@ def merge_and_format_dates(date_list):
 
     return result
 
+
 def calculate_attendance(data_list):
     # 使用字典来存储每一天的时间点的最早和最晚时间
     attendance_times = {}
@@ -83,6 +84,28 @@ def calculate_attendance(data_list):
     return attendance_duration
 
 
+def calculate_active_time(update_times):
+    active_time = timedelta(minutes=5)
+    total_active_time = timedelta()
+
+    # 对刺激时间序列进行排序
+    sorted_times = sorted(update_times)
+    if len(sorted_times) == 0:
+        return 0
+    current_time = sorted_times[0]
+    start_time = current_time - active_time
+    for update_time in sorted_times[1:]:
+        if update_time - active_time < current_time:
+            current_time = update_time
+        else:
+            total_active_time += current_time - start_time
+            current_time = update_time
+            start_time = current_time - active_time
+    total_active_time += current_time - start_time
+
+    return total_active_time.total_seconds() / 60
+
+
 def get_score(data, difficulty):
     # 单声部精唱 单声部视谱即唱 双声部
     sing_score_sheet = []
@@ -104,12 +127,11 @@ def get_score(data, difficulty):
             attendance_data.append(item[4])  # 将出勤时间添加到列表中
 
     # 计算出勤时间
-    attendance_duration = calculate_attendance(attendance_data)
+    attendance_duration = calculate_active_time(attendance_data)
 
     sing_score_sheet = merge_and_format_dates(sing_score_sheet)
 
     return sing_score_sheet, attendance_duration
-
 
 
 def solfeggio_traversal():
@@ -135,19 +157,16 @@ def solfeggio_traversal():
                 data = cursor.fetchall()
                 score_list, attendance_duration = get_score(data, difficulty)
                 for j, score in enumerate(score_list):
-                    sheet.write(index + 1, j + 4, str(score)) 
-                
-                # 计算平均在线时长
-                if attendance_duration:  # 检查字典是否为空
-                    total_attendance_time = sum(attendance_duration.values())  # 计算总在线时长
-                    total_attendance_time = round(total_attendance_time, 2)  # 精确到小数点后两位
-                    sheet.write(index + 1, 3, total_attendance_time)  # 将平均在线时长写入第四列
-                else:
-                    sheet.write(index + 1, 3, 0)  # 如果字典为空，则平均在线时长为0
+                    sheet.write(index + 1, j + 4, str(score))
 
-
-
-
+                    # 计算平均在线时长
+                sheet.write(index + 1, 3, attendance_duration)
+                # if attendance_duration:  # 检查字典是否为空
+                #     total_attendance_time = sum(attendance_duration.values())  # 计算总在线时长
+                #     total_attendance_time = round(total_attendance_time, 2)  # 精确到小数点后两位
+                #     sheet.write(index + 1, 3, total_attendance_time)  # 将平均在线时长写入第四列
+                # else:
+                #     sheet.write(index + 1, 3, 0)  # 如果字典为空，则平均在线时长为0
 
 
 if __name__ == '__main__':
@@ -160,7 +179,7 @@ if __name__ == '__main__':
 
     if not os.path.exists(path):
         os.makedirs(path)
-    workbook.save(os.path.join(path, '学生在线时间2023-12.xls'))
+    workbook.save(os.path.join(path, '学生在线时间2023-1222.xls'))
 
     conn.commit()
     conn.close()
