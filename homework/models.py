@@ -1,7 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
-from user.models import Student
+from django.db import models
 from django.utils import timezone
+
+from user.models import Student
 
 
 # 视唱作业
@@ -26,6 +27,10 @@ class SightsingingRecord(models.Model):
     def __str__(self):
         return self.part_id
 
+    class Meta:
+        verbose_name = '视唱作业记录表'
+        verbose_name_plural = verbose_name
+
 
 # 选择题作业
 class ChoiceRecord(models.Model):
@@ -37,6 +42,10 @@ class ChoiceRecord(models.Model):
 
     def __str__(self):
         return self.part_id
+
+    class Meta:
+        verbose_name = '练耳选择题作业记录表'
+        verbose_name_plural = verbose_name
 
 
 # 听写题作业
@@ -52,6 +61,10 @@ class DictationRecord(models.Model):
     def __str__(self):
         return self.part_id
 
+    class Meta:
+        verbose_name = '练耳听写题作业记录表'
+        verbose_name_plural = verbose_name
+
 
 # 题组列表
 class QuesGroupRecord(models.Model):
@@ -65,6 +78,13 @@ class QuesGroupRecord(models.Model):
     teacher_score = models.IntegerField(null=True)
     record_time = models.DateTimeField(default=timezone.now)
     record_id = models.BigIntegerField(null=True)
+
+    def __str__(self):
+        return self.group_part_id
+
+    class Meta:
+        verbose_name = '题组记录表'
+        verbose_name_plural = verbose_name
 
 
 def getFieldPath(instance, filename):
@@ -83,14 +103,35 @@ class Audio(models.Model):
     part_id = models.CharField(max_length=50)
     content = models.FileField(upload_to=getFieldPath)
 
+    def __str__(self):
+        return self.part_id
+
+    class Meta:
+        verbose_name = '音频记录表'
+        verbose_name_plural = verbose_name
+
 
 class Json(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='json_user')
     part_id = models.CharField(max_length=50)
     content = models.FileField(upload_to=getFieldPath)
 
+    def __str__(self):
+        return self.part_id
+
+    class Meta:
+        verbose_name = 'json记录表'
+        verbose_name_plural = verbose_name
+
 
 class Png(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='png_user')
     part_id = models.CharField(max_length=50)
     content = models.FileField(upload_to=getFieldPath)
+
+    def __str__(self):
+        return self.part_id
+
+    class Meta:
+        verbose_name = '图片记录表'
+        verbose_name_plural = verbose_name

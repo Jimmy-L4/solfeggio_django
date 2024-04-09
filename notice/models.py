@@ -27,3 +27,7 @@ class Notice(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        verbose_name = '通知表单'
+        verbose_name_plural = verbose_name
