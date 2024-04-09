@@ -6,6 +6,7 @@ from .models import Student, Teacher, Class, Course
 class StudentUnderwriterAdmin(admin.ModelAdmin):
     # 需要显示的字段信息
     list_display = ('user', 'name', 'my_class')
+    search_fields = ('name', 'user__username')
 
 
 class TeacherUnderwriterAdmin(admin.ModelAdmin):
