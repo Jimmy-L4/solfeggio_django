@@ -1,6 +1,6 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 
 # 教师
@@ -16,6 +16,10 @@ class Teacher(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = '教师表'
+        verbose_name_plural = verbose_name
 
 
 # 课程
@@ -34,6 +38,10 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = '课程表'
+        verbose_name_plural = verbose_name
+
 
 # 班级
 class Class(models.Model):
@@ -44,6 +52,13 @@ class Class(models.Model):
     teacher = models.ForeignKey(Teacher, null=True, on_delete=models.SET(0), related_name='class_teacher')
     # 课程
     course = models.ForeignKey(Course, null=True, on_delete=models.SET(0), related_name='class_course')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '班级表'
+        verbose_name_plural = verbose_name
 
 
 # 学生
@@ -69,3 +84,7 @@ class Student(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = '学生表'
+        verbose_name_plural = verbose_name

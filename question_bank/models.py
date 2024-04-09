@@ -1,6 +1,5 @@
-from django.db import models
-from django.utils import timezone
 from django.contrib.auth.models import User
+from django.db import models
 
 
 # 选择题题库
@@ -37,6 +36,13 @@ class ChoiceQuestion(models.Model):
     d_txt = models.TextField(null=True)
     ques_audio_size = models.FloatField()
 
+    def __str__(self):
+        return self.part_id
+
+    class Meta:
+        verbose_name = '选择题题库'
+        verbose_name_plural = verbose_name
+
 
 # 听写题题库
 class DictationQuestion(models.Model):
@@ -59,6 +65,13 @@ class DictationQuestion(models.Model):
     a_txt = models.TextField(null=True)
     ques_audio_size = models.FloatField()
 
+    def __str__(self):
+        return self.part_id
+
+    class Meta:
+        verbose_name = '听写题题库'
+        verbose_name_plural = verbose_name
+
 
 # 视唱题题库
 class SightsingingQuestion(models.Model):
@@ -71,6 +84,13 @@ class SightsingingQuestion(models.Model):
     xml_path = models.TextField()
     audio_size = models.FloatField()
 
+    def __str__(self):
+        return self.part_id
+
+    class Meta:
+        verbose_name = '视唱题题库'
+        verbose_name_plural = verbose_name
+
 
 # 音频库
 class AudioDetail(models.Model):
@@ -81,3 +101,10 @@ class AudioDetail(models.Model):
     audio_nation = models.TextField(null=True)
     audio_skill = models.TextField(null=True)
     audio_size = models.FloatField()
+
+    def __str__(self):
+        return self.part_id
+
+    class Meta:
+        verbose_name = '音频库'
+        verbose_name_plural = verbose_name

@@ -21,3 +21,7 @@ class CourseConfig(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        verbose_name = '系统配置表'
+        verbose_name_plural = verbose_name
