@@ -7,22 +7,22 @@ from user.models import Student
 
 # 视唱作业
 class SightsingingRecord(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='sightsinging_user')
-    coop_user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='sightsinging_coopUser')
-    ques_type = models.IntegerField(null=True)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='sightsinging_user')
+    coop_user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='sightsinging_coopUser')
+    ques_type = models.IntegerField(null=True, blank=True)
     part_id = models.CharField(max_length=50)
     record_time = models.DateTimeField(default=timezone.now)
     audio = models.TextField()
-    vice_audio = models.TextField(null=True)
-    merge_audio = models.TextField(null=True)
-    computer_score = models.IntegerField(null=True)
-    teacher_score = models.IntegerField(null=True)
-    fluency = models.IntegerField(null=True)
-    speed = models.IntegerField(null=True)
-    rhythm = models.IntegerField(null=True)
-    alignment = models.IntegerField(null=True)
-    chord = models.IntegerField(null=True)
-    pitch = models.IntegerField(null=True)
+    vice_audio = models.TextField(null=True, blank=True)
+    merge_audio = models.TextField(null=True, blank=True)
+    computer_score = models.IntegerField(null=True, blank=True)
+    teacher_score = models.IntegerField(null=True, blank=True)
+    fluency = models.IntegerField(null=True, blank=True)
+    speed = models.IntegerField(null=True, blank=True)
+    rhythm = models.IntegerField(null=True, blank=True)
+    alignment = models.IntegerField(null=True, blank=True)
+    chord = models.IntegerField(null=True, blank=True)
+    pitch = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.part_id
@@ -50,12 +50,12 @@ class ChoiceRecord(models.Model):
 
 # 听写题作业
 class DictationRecord(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='dictation_user')
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='dictation_user')
     part_id = models.CharField(max_length=50)
-    json_field = models.TextField(null=True)
-    png_field = models.TextField(null=True)
-    computer_score = models.IntegerField(null=True)
-    teacher_score = models.IntegerField(null=True)
+    json_field = models.TextField(null=True, blank=True)
+    png_field = models.TextField(null=True, blank=True)
+    computer_score = models.IntegerField(null=True, blank=True)
+    teacher_score = models.IntegerField(null=True, blank=True)
     record_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -68,16 +68,16 @@ class DictationRecord(models.Model):
 
 # 题组列表
 class QuesGroupRecord(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='Ques_user')
-    coop_user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='Ques_coopUser')
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='Ques_user')
+    coop_user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='Ques_coopUser')
     group_part_id = models.CharField(max_length=50)
     group_title = models.TextField()
     lesson_No = models.CharField(max_length=5)
     state = models.IntegerField()
-    computer_score = models.IntegerField(null=True)
-    teacher_score = models.IntegerField(null=True)
+    computer_score = models.IntegerField(null=True, blank=True)
+    teacher_score = models.IntegerField(null=True, blank=True)
     record_time = models.DateTimeField(default=timezone.now)
-    record_id = models.BigIntegerField(null=True)
+    record_id = models.BigIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.group_part_id
@@ -99,7 +99,7 @@ def getFieldPath(instance, filename):
 
 
 class Audio(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='audio_user')
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='audio_user')
     part_id = models.CharField(max_length=50)
     content = models.FileField(upload_to=getFieldPath)
 
@@ -112,7 +112,7 @@ class Audio(models.Model):
 
 
 class Json(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='json_user')
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='json_user')
     part_id = models.CharField(max_length=50)
     content = models.FileField(upload_to=getFieldPath)
 
@@ -125,7 +125,7 @@ class Json(models.Model):
 
 
 class Png(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.SET(0), related_name='png_user')
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(0), related_name='png_user')
     part_id = models.CharField(max_length=50)
     content = models.FileField(upload_to=getFieldPath)
 
